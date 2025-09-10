@@ -8,8 +8,8 @@ package chess;
  */
 public class ChessPosition {
 
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -32,8 +32,23 @@ public class ChessPosition {
         return col;
     }
 
+    public boolean inBounds() {
+        if (row < 1 || row > 8){
+            return false;
+        }
+        if (col < 1 || col > 8){
+            return false;
+        }
+        return true;
+    }
+
+    public void updatePosition(int row, int col){
+        this.row += row;
+        this.col += col;
+    }
+
     @Override
     public String toString() {
-        return String.format("%d,%d", row, col);
+        return String.format("[%d,%d]", row, col);
     }
 }
