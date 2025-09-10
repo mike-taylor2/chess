@@ -54,37 +54,26 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        List<ChessMove> myMoves = new ArrayList<>();
-//        ChessPosition initialPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-//
-//
-//        ChessPiece piece = board.getPiece(myPosition);
-//        if (piece.getPieceType() == PieceType.BISHOP){
-//            myPosition.updatePosition(-1, 1);
-//            while (myPosition.inBounds()){
-//                myMoves.add(new ChessMove(initialPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()), null));
-//                myPosition.updatePosition(-1, 1);
-//            }
-//            myPosition = initialPosition;
-//            myPosition.updatePosition(-1, -1);
-//            while (myPosition.inBounds()){
-//                myMoves.add(new ChessMove(initialPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()), null));
-//                myPosition.updatePosition(-1, -1);
-//            }
-//            myPosition = initialPosition;
-//            myPosition.updatePosition(1, 1);
-//            while (myPosition.inBounds()){
-//                myMoves.add(new ChessMove(initialPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()), null));
-//                myPosition.updatePosition(1, 1);
-//            }
-//            myPosition = initialPosition;
-//            myPosition.updatePosition(-1, -1);
-//            while (myPosition.inBounds()){
-//                myMoves.add(new ChessMove(initialPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()), null));
-//                myPosition.updatePosition(-1, -1);
-//            }
-//            return myMoves;
-//        }
+        List<ChessMove> myMoves = new ArrayList<>();
+
+
+        ChessPiece piece = board.getPiece(myPosition);
+        if (piece.getPieceType() == PieceType.BISHOP){
+            int x_cor = 1;
+            while (x_cor < 9){
+                int hor_distance = Math.abs(x_cor- myPosition.getRow());
+                if (hor_distance == 0) {x_cor++; continue;}
+
+                for (int y_cor = 1; y_cor<9; y_cor++){
+                    if (Math.abs(y_cor- myPosition.getColumn()) == hor_distance){
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                }
+                x_cor++;
+            }
+            return myMoves;
+        }
         return List.of();
     }
 }
