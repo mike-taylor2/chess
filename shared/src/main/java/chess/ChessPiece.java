@@ -58,14 +58,17 @@ public class ChessPiece {
 
 
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP){
+        if (piece.getPieceType() == PieceType.BISHOP) {
             int x_cor = 1;
-            while (x_cor < 9){
-                int hor_distance = Math.abs(x_cor- myPosition.getRow());
-                if (hor_distance == 0) {x_cor++; continue;}
+            while (x_cor < 9) {
+                int hor_distance = Math.abs(x_cor - myPosition.getRow());
+                if (hor_distance == 0) {
+                    x_cor++;
+                    continue;
+                }
 
-                for (int y_cor = 1; y_cor<9; y_cor++){
-                    if (Math.abs(y_cor- myPosition.getColumn()) == hor_distance){
+                for (int y_cor = 1; y_cor < 9; y_cor++) {
+                    if (Math.abs(y_cor - myPosition.getColumn()) == hor_distance) {
                         myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
                                 new ChessPosition(x_cor, y_cor), null));
                     }
@@ -74,6 +77,23 @@ public class ChessPiece {
             }
             return myMoves;
         }
-        return List.of();
+        if (piece.getPieceType() == PieceType.ROOK) {
+            int x_cor = 1;
+            int y_cor = 1;
+            while (x_cor < 9) {
+                while (y_cor < 9) {
+                    if (x_cor == myPosition.getRow() && y_cor == myPosition.getColumn()) {
+                        continue;
+                    }
+                    if (x_cor == myPosition.getRow() || y_cor == myPosition.getColumn()) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    y_cor++;
+                }
+                x_cor++;
+            }
+        }
+        return myMoves;
     }
 }
