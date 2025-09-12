@@ -75,13 +75,10 @@ public class ChessPiece {
                 }
                 x_cor++;
             }
-            return myMoves;
         }
         if (piece.getPieceType() == PieceType.ROOK) {
-            int x_cor = 1;
-            int y_cor = 1;
-            while (x_cor < 9) {
-                while (y_cor < 9) {
+            for (int x_cor = 1; x_cor < 9; x_cor++ ) {
+                for (int y_cor = 1; y_cor < 9; y_cor++ ) {
                     if (x_cor == myPosition.getRow() && y_cor == myPosition.getColumn()) {
                         continue;
                     }
@@ -89,9 +86,48 @@ public class ChessPiece {
                         myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
                                 new ChessPosition(x_cor, y_cor), null));
                     }
-                    y_cor++;
                 }
-                x_cor++;
+            }
+        }
+        if (piece.getPieceType() == PieceType.KING) {
+            for (int x_cor = 1; x_cor < 9; x_cor++ ) {
+                for (int y_cor = 1; y_cor < 9; y_cor++ ) {
+                    if (x_cor == myPosition.getRow() && y_cor == myPosition.getColumn()) {
+                        continue;
+                    }
+                    if (x_cor == myPosition.getRow()-1 && y_cor == myPosition.getColumn()) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow()-1 && y_cor == myPosition.getColumn()+1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow() && y_cor == myPosition.getColumn()+1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow()+1 && y_cor == myPosition.getColumn()+1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow()+1 && y_cor == myPosition.getColumn()) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow()+1 && y_cor == myPosition.getColumn()-1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow() && y_cor == myPosition.getColumn()-1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                    if (x_cor == myPosition.getRow()-1 && y_cor == myPosition.getColumn()-1) {
+                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                                new ChessPosition(x_cor, y_cor), null));
+                    }
+                }
             }
         }
         return myMoves;
