@@ -1,5 +1,7 @@
 package chess;
 
+import chess.move_calculators.BishopMoveCalculator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,24 +60,31 @@ public class ChessPiece {
 
 
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            int x_cor = 1;
-            while (x_cor < 9) {
-                int hor_distance = Math.abs(x_cor - myPosition.getRow());
-                if (hor_distance == 0) {
-                    x_cor++;
-                    continue;
-                }
+//        if (piece.getPieceType() == PieceType.BISHOP) {
+//            int x_cor = 1;
+//            while (x_cor < 9) {
+//                int hor_distance = Math.abs(x_cor - myPosition.getRow());
+//                if (hor_distance == 0) {
+//                    x_cor++;
+//                    continue;
+//                }
+//
+//                for (int y_cor = 1; y_cor < 9; y_cor++) {
+//                    if (Math.abs(y_cor - myPosition.getColumn()) == hor_distance) {
+//                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+//                                new ChessPosition(x_cor, y_cor), null));
+//                    }
+//                }
+//                x_cor++;
+//            }
+//        }
 
-                for (int y_cor = 1; y_cor < 9; y_cor++) {
-                    if (Math.abs(y_cor - myPosition.getColumn()) == hor_distance) {
-                        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
-                                new ChessPosition(x_cor, y_cor), null));
-                    }
-                }
-                x_cor++;
-            }
+        if (piece.getPieceType() == PieceType.BISHOP){
+            var BishopMoves = new BishopMoveCalculator();
+            return BishopMoves.CalculateMoves();
         }
+
+
         if (piece.getPieceType() == PieceType.ROOK) {
             for (int x_cor = 1; x_cor < 9; x_cor++ ) {
                 for (int y_cor = 1; y_cor < 9; y_cor++ ) {
