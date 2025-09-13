@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.List;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -24,6 +26,7 @@ public class ChessMove {
     /**
      * @return ChessPosition of starting location
      */
+
     public ChessPosition getStartPosition() {
         return startPosition;
     }
@@ -43,6 +46,12 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+
+    static void addMoves(List<ChessMove> myMoves, ChessPosition myPosition, int x, int y){
+        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                new ChessPosition(x, y), null));
     }
 
     @Override

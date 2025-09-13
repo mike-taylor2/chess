@@ -1,4 +1,4 @@
-package chess.move_calculators;
-
-public class QueenMoveCalculator extends PieceMoveCalculator{
-}
+//package chess.move_calculators;
+//
+//public class QueenMoveCalculator extends PieceMoveCalculator{
+//}

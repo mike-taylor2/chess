@@ -43,4 +43,8 @@ public class ChessBoard {
     }
 
     public boolean isEmpty(int x_cor, int y_cor) {return squares[x_cor - 1][y_cor -1] == null;}
+
+    public boolean isOppColor(int x, int y, ChessGame.TeamColor color){
+        return squares[x-1][y-1].getTeamColor() == color;
+    }
 }
