@@ -60,7 +60,7 @@ public class ChessBoard {
     }
 
     public boolean isOppColor(int x, int y, ChessGame.TeamColor color){
-        return squares[x-1][y-1].getTeamColor() == color;
+        return squares[x-1][y-1].getTeamColor() != color;
     }
 
     @Override
