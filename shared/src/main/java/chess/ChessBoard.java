@@ -47,6 +47,18 @@ public class ChessBoard {
 
     public boolean isEmpty(int x_cor, int y_cor) {return squares[x_cor - 1][y_cor -1] == null;}
 
+    public boolean legalDiagonal(ChessPosition myPosition, int x, int y){
+        int newXPosition = myPosition.getRow() + x;
+        int newYPosition = myPosition.getColumn() + y;
+
+        if (newXPosition < 1 || newYPosition < 1) {return false;}
+        if (newXPosition > 8 || newYPosition > 8) {return false;}
+
+        if (this.isEmpty(myPosition.getRow() + x, myPosition.getColumn() + y)){ return true;}
+        if (this.isOppColor(myPosition.getRow()+x, myPosition.getColumn()+y, this.getPiece(new ChessPosition(newXPosition, newYPosition)).getTeamColor())){return true;}
+        return false;
+    }
+
     public boolean isOppColor(int x, int y, ChessGame.TeamColor color){
         return squares[x-1][y-1].getTeamColor() == color;
     }

@@ -34,9 +34,6 @@ public class ChessPosition {
         return col;
     }
 
-    public boolean isDiagonal(int x, int y){
-        return Math.abs(row - x) == Math.abs(col - y);
-    }
 
 //    public boolean inBounds() {
 //        if (row < 1 || row > 8){
