@@ -17,7 +17,7 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
-    private ChessPosition position;
+
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -73,6 +73,8 @@ public class ChessPiece {
         }
 
         else if (piece.getPieceType() == PieceType.KNIGHT){
+            KnightMoveCalculator myKnightMoves = new KnightMoveCalculator(board, piece, myPosition);
+            myMoves = myKnightMoves.CalculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.QUEEN){
@@ -97,11 +99,11 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type && Objects.equals(position, that.position);
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pieceColor, type, position);
+        return Objects.hash(pieceColor, type);
     }
 }
