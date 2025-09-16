@@ -73,11 +73,11 @@ public class ChessPiece {
         }
 
         else if (piece.getPieceType() == PieceType.KNIGHT){
-
         }
 
         else if (piece.getPieceType() == PieceType.QUEEN){
-
+            QueenMoveCalculator myQueenMoves = new QueenMoveCalculator(board, piece, myPosition);
+            myMoves = myQueenMoves.CalculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.ROOK){
