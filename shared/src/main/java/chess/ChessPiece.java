@@ -66,7 +66,27 @@ public class ChessPiece {
         if (piece.getPieceType() == PieceType.BISHOP) {
             BishopMoveCalculator myBishopMoves = new BishopMoveCalculator(board, piece, myPosition);
             myMoves = myBishopMoves.CalculateMoves();
-            return myMoves;
+        }
+
+        else if (piece.getPieceType() == PieceType.KING){
+            KingMoveCalculator myKingMoves = new KingMoveCalculator(board, piece, myPosition);
+            myMoves = myKingMoves.CalculateMoves();
+        }
+
+        else if (piece.getPieceType() == PieceType.KNIGHT){
+
+        }
+
+        else if (piece.getPieceType() == PieceType.QUEEN){
+
+        }
+
+        else if (piece.getPieceType() == PieceType.ROOK){
+
+        }
+
+        else if (piece.getPieceType() == PieceType.PAWN){
+
         }
         return myMoves;
     }
