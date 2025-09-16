@@ -60,7 +60,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessMove> myMoves = new ArrayList<>();
 
-
         ChessPiece piece = board.getPiece(myPosition);
 
         if (piece.getPieceType() == PieceType.BISHOP) {
@@ -82,7 +81,8 @@ public class ChessPiece {
         }
 
         else if (piece.getPieceType() == PieceType.ROOK){
-
+            RookMoveCalculator myRookMoves = new RookMoveCalculator(board, piece, myPosition);
+            myMoves = myRookMoves.CalculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.PAWN){
