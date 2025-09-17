@@ -55,6 +55,11 @@ public class ChessMove {
                 new ChessPosition(x, y), null));
     }
 
+    static void addMovesPromotion(List<ChessMove> myMoves, ChessPosition myPosition, int x, int y, ChessPiece.PieceType promotion){
+        myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
+                new ChessPosition(x, y), promotion));
+    }
+
     @Override
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);

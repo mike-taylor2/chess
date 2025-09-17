@@ -88,7 +88,8 @@ public class ChessPiece {
         }
 
         else if (piece.getPieceType() == PieceType.PAWN){
-
+            PawnMoveCalculator myPawnMoves = new PawnMoveCalculator(board, piece, myPosition);
+            myMoves = myPawnMoves.CalculateMoves();
         }
         return myMoves;
     }
