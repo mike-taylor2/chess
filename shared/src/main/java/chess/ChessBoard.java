@@ -43,6 +43,7 @@ public class ChessBoard {
      */
     public void resetBoard() {
         squares = new ChessPiece[8][8];
+
         for (int y = 1; y<9; y++){addPiece(new ChessPosition(2, y), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));}
         for (int y = 1; y<9; y++){addPiece(new ChessPosition(7, y), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));}
 
