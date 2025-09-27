@@ -14,9 +14,16 @@ import java.util.Objects;
 public class ChessGame {
     ChessBoard myBoard = new ChessBoard();
     Boolean whiteTurn = true;
+    List<ChessPosition> whitePositions = new ArrayList<>();
+    List<ChessPosition> blackPositions = new ArrayList<>();
+    List<ChessBoard> boardHistory = new ArrayList<>();
+
+    ChessPosition positionOfKillPiece = null;
 
     public ChessGame() {
         myBoard.resetBoard();
+
+        //initialize white and black position arrays here
     }
 
     /**
@@ -53,6 +60,13 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         List<ChessMove> myValidMoves = new ArrayList<>();
+
+        ChessPiece myPiece = myBoard.getPiece(startPosition);
+        var allMoves = myPiece.pieceMoves(myBoard, startPosition);
+
+        //Here, you must include the logic that if the King is in check, the only valid move is to move the king OR kill the offending piece
+
+
         return myValidMoves;
     }
 
@@ -63,7 +77,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        var validMoves = validMoves(move.getStartPosition());
+        if (!validMoves.contains(move)){throw new InvalidMoveException();}
+
+        // Need to check for promotion
+        // encapsulate addPiece() and removePiece()
+        // Update black and white position arrays including accounting for when a piece is eliminated
+        // You must also keep track of KillPiece to know who could kill the king.
+
     }
 
     /**
@@ -78,7 +99,7 @@ public class ChessGame {
             for (int c = 1; c < 9; c++){
                 if (!myBoard.isEmpty(r, c) && myBoard.isOppColor(r, c, teamColor)){
                     ChessPosition enemyPosition = new ChessPosition(r, c);
-                    if (!safeMove(kingPosition, enemyPosition)){return true;}}
+                    if (inCheckMove(kingPosition, enemyPosition)){return true;}}
             }
         }
         return false;
@@ -91,7 +112,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = locateKing(teamColor);
+        //Create an anyValidMoves function that checks ValidMoves for ALL pieces on a team
+
+        if (isInCheck(teamColor) && validMoves(kingPosition).isEmpty()){return true;}
+        return false;
     }
 
     /**
@@ -123,15 +148,15 @@ public class ChessGame {
         return myBoard;
     }
 
-    public boolean safeMove(ChessPosition kingPosition, ChessPosition enemyPosition){
+    public boolean inCheckMove(ChessPosition kingPosition, ChessPosition enemyPosition){
         ChessPiece enemyPiece = myBoard.getPiece(enemyPosition);
         var enemyMoves = enemyPiece.pieceMoves(myBoard, enemyPosition);
         for (ChessMove move : enemyMoves){
             if (move.contains(kingPosition)){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private ChessPosition locateKing(TeamColor team){
