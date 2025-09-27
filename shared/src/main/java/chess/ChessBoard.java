@@ -75,6 +75,10 @@ public class ChessBoard {
         return squares[x-1][y-1].getTeamColor() != color;
     }
 
+    public boolean isSameColor(int x, int y, ChessGame.TeamColor color){
+        return squares[x-1][y-1].getTeamColor() == color;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

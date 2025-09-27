@@ -73,7 +73,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        var kingPosition = locateKing(teamColor);
+        ChessPosition kingPosition = locateKing(teamColor);
+        for (int r = 1; r < 9; r++){
+            for (int c = 1; c < 9; c++){
+                if (!myBoard.isEmpty(r, c) && myBoard.isOppColor(r, c, teamColor)){
+                    ChessPosition enemyPosition = new ChessPosition(r, c);
+                    if (!safeMove(kingPosition, enemyPosition)){return true;}}
+            }
+        }
+        return false;
     }
 
     /**
@@ -115,19 +123,29 @@ public class ChessGame {
         return myBoard;
     }
 
+    public boolean safeMove(ChessPosition kingPosition, ChessPosition enemyPosition){
+        ChessPiece enemyPiece = myBoard.getPiece(enemyPosition);
+        var enemyMoves = enemyPiece.pieceMoves(myBoard, enemyPosition);
+        for (ChessMove move : enemyMoves){
+            if (move.contains(kingPosition)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     private ChessPosition locateKing(TeamColor team){
             for (int r = 1; r < 9; r++){
                 for (int c = 1; c < 9; c++){
-                    var myPiece = (myBoard.getPiece(new ChessPosition(r, c)));
-                    if ((myPiece.getTeamColor() == team) && (myPiece.getPieceType() == ChessPiece.PieceType.KING)){
-                        return new ChessPosition(r,c);
+                    if (!myBoard.isEmpty(r, c) && myBoard.isSameColor(r, c, team)){
+                        var myPiece = (myBoard.getPiece(new ChessPosition(r,c)));
+                        if (myPiece.getPieceType() == ChessPiece.PieceType.KING){
+                            return new ChessPosition(r,c);
+                        }
                     }
                 }
-
-
-
-        }
-    }
+            }
+    return null;}
 
     @Override
     public boolean equals(Object o) {

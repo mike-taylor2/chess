@@ -60,6 +60,10 @@ public class ChessMove {
                 new ChessPosition(x, y), promotion));
     }
 
+    public boolean contains(ChessPosition kingPosition){
+        return kingPosition.equals(endPosition);
+    }
+
     @Override
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
