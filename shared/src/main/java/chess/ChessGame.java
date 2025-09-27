@@ -15,16 +15,18 @@ public class ChessGame {
 
     List<ChessMove> myValidMoves = new ArrayList<>();
     ChessBoard myBoard = new ChessBoard();
+    Boolean whiteTurn = true;
 
     public ChessGame() {
-
+        myBoard.resetBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        if (whiteTurn){return TeamColor.WHITE;}
+        else {return TeamColor.BLACK;}
     }
 
     /**
@@ -33,7 +35,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        whiteTurn = team == TeamColor.WHITE;
     }
 
     /**

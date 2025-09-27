@@ -1,7 +1,5 @@
 package chess;
 
-//import chess.move_calculators.BishopMoveCalculator;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
