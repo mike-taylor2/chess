@@ -12,8 +12,6 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-
-    List<ChessMove> myValidMoves = new ArrayList<>();
     ChessBoard myBoard = new ChessBoard();
     Boolean whiteTurn = true;
 
@@ -54,7 +52,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        List<ChessMove> myValidMoves = new ArrayList<>();
+        return myValidMoves;
     }
 
     /**
@@ -74,7 +73,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        var kingPosition = locateKing(teamColor);
     }
 
     /**
@@ -116,18 +115,32 @@ public class ChessGame {
         return myBoard;
     }
 
+    private ChessPosition locateKing(TeamColor team){
+            for (int r = 1; r < 9; r++){
+                for (int c = 1; c < 9; c++){
+                    var myPiece = (myBoard.getPiece(new ChessPosition(r, c)));
+                    if ((myPiece.getTeamColor() == team) && (myPiece.getPieceType() == ChessPiece.PieceType.KING)){
+                        return new ChessPosition(r,c);
+                    }
+                }
+
+
+
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(myValidMoves, chessGame.myValidMoves) && Objects.equals(myBoard, chessGame.myBoard);
+        return Objects.equals(myBoard, chessGame.myBoard) && Objects.equals(whiteTurn, chessGame.whiteTurn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(myValidMoves, myBoard);
+        return Objects.hash(myBoard, whiteTurn);
     }
 }
 
