@@ -22,7 +22,14 @@ public class ChessGame {
 
     public ChessGame() {
         myBoard.resetBoard();
-
+        for (int c = 1; c<9; c++){
+            whitePositions.add(new ChessPosition(1, c));
+            whitePositions.add(new ChessPosition(2, c));
+        }
+        for (int c = 1; c<9; c++){
+            blackPositions.add(new ChessPosition(7, c));
+            blackPositions.add(new ChessPosition(8, c));
+        }
         //initialize white and black position arrays here
     }
 
@@ -65,6 +72,7 @@ public class ChessGame {
         var allMoves = myPiece.pieceMoves(myBoard, startPosition);
 
         //Here, you must include the logic that if the King is in check, the only valid move is to move the king OR kill the offending piece
+        //You must also include the logic that if your potential move leaves your king in check, that is an invalid move (testMove method?)
 
 
         return myValidMoves;
@@ -80,7 +88,7 @@ public class ChessGame {
         var validMoves = validMoves(move.getStartPosition());
         if (!validMoves.contains(move)){throw new InvalidMoveException();}
 
-        // Need to check for promotion
+        // Need to check for promotion and include that in addPiece()
         // encapsulate addPiece() and removePiece()
         // Update black and white position arrays including accounting for when a piece is eliminated
         // You must also keep track of KillPiece to know who could kill the king.

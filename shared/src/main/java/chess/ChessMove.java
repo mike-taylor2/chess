@@ -50,14 +50,14 @@ public class ChessMove {
     }
 
 
-    static void addMoves(List<ChessMove> myMoves, ChessPosition myPosition, int x, int y){
+    static void addMoves(List<ChessMove> myMoves, ChessPosition myPosition, int r, int c){
         myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
-                new ChessPosition(x, y), null));
+                new ChessPosition(r, c), null));
     }
 
-    static void addMovesPromotion(List<ChessMove> myMoves, ChessPosition myPosition, int x, int y, ChessPiece.PieceType promotion){
+    static void addMovesPromotion(List<ChessMove> myMoves, ChessPosition myPosition, int r, int c, ChessPiece.PieceType promotion){
         myMoves.add(new ChessMove(new ChessPosition(myPosition.getRow(), myPosition.getColumn()),
-                new ChessPosition(x, y), promotion));
+                new ChessPosition(r, c), promotion));
     }
 
     public boolean contains(ChessPosition kingPosition){

@@ -44,8 +44,8 @@ public class ChessBoard {
     public void resetBoard() {
         squares = new ChessPiece[8][8];
 
-        for (int y = 1; y<9; y++){addPiece(new ChessPosition(2, y), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));}
-        for (int y = 1; y<9; y++){addPiece(new ChessPosition(7, y), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));}
+        for (int c = 1; c<9; c++){addPiece(new ChessPosition(2, c), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));}
+        for (int c = 1; c<9; c++){addPiece(new ChessPosition(7, c), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));}
 
         addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
         addPiece(new ChessPosition(1, 8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
@@ -69,14 +69,14 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
     }
 
-    public boolean isEmpty(int x_cor, int y_cor) {return squares[x_cor - 1][y_cor -1] == null;}
+    public boolean isEmpty(int r, int c) {return squares[r - 1][c -1] == null;}
 
-    public boolean isOppColor(int x, int y, ChessGame.TeamColor color){
-        return squares[x-1][y-1].getTeamColor() != color;
+    public boolean isOppColor(int r, int c, ChessGame.TeamColor color){
+        return squares[r-1][c-1].getTeamColor() != color;
     }
 
-    public boolean isSameColor(int x, int y, ChessGame.TeamColor color){
-        return squares[x-1][y-1].getTeamColor() == color;
+    public boolean isSameColor(int r, int c, ChessGame.TeamColor color){
+        return squares[r-1][c-1].getTeamColor() == color;
     }
 
     @Override

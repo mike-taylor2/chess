@@ -35,20 +35,6 @@ public class ChessPosition {
     }
 
 
-//    public boolean inBounds() {
-//        if (row < 1 || row > 8){
-//            return false;
-//        }
-//        if (col < 1 || col > 8){
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    public void updatePosition(int row, int col){
-//        this.row += row;
-//        this.col += col;
-//    }
 
     @Override
     public String toString() {
