@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
-    private final PieceType type;
+    private PieceType type;
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -46,6 +46,21 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return type;
+    }
+
+    public void switchPieceType(ChessPiece.PieceType promotion){
+        if (promotion == PieceType.BISHOP){
+            type = PieceType.BISHOP;
+        }
+        else if (promotion == PieceType.ROOK){
+            type = PieceType.ROOK;
+        }
+        else if (promotion == PieceType.KNIGHT){
+            type = PieceType.KNIGHT;
+        }
+        else if (promotion == PieceType.QUEEN){
+            type = PieceType.QUEEN;
+        }
     }
 
     /**

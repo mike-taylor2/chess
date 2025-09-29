@@ -16,12 +16,16 @@ public class ChessGame {
     Boolean whiteTurn = true;
     List<ChessPosition> whitePositions = new ArrayList<>();
     List<ChessPosition> blackPositions = new ArrayList<>();
+    ChessPosition whiteKing;
+    ChessPosition blackKing;
     List<ChessBoard> boardHistory = new ArrayList<>();
 
     ChessPosition positionOfKillPiece = null;
 
     public ChessGame() {
         myBoard.resetBoard();
+        whiteKing = new ChessPosition(1,5);
+        blackKing = new ChessPosition(8,5);
         for (int c = 1; c<9; c++){
             whitePositions.add(new ChessPosition(1, c));
             whitePositions.add(new ChessPosition(2, c));
@@ -30,7 +34,6 @@ public class ChessGame {
             blackPositions.add(new ChessPosition(7, c));
             blackPositions.add(new ChessPosition(8, c));
         }
-        //initialize white and black position arrays here
     }
 
     /**
@@ -70,8 +73,13 @@ public class ChessGame {
 
         ChessPiece myPiece = myBoard.getPiece(startPosition);
         var allMoves = myPiece.pieceMoves(myBoard, startPosition);
+        for (ChessMove move : allMoves){
+            if (legalMove(move)){
+                myValidMoves.add(move);
+            }
+        }
 
-        //Here, you must include the logic that if the King is in check, the only valid move is to move the king OR kill the offending piece
+        //Here, you must include the logic that if the King is in check, the only valid move is to move to protect the King OR kill the offending piece
         //You must also include the logic that if your potential move leaves your king in check, that is an invalid move (testMove method?)
 
 
@@ -95,6 +103,44 @@ public class ChessGame {
 
     }
 
+    // Determines if check/checkmate rules prevents a move from being made. Returns true if the move is legal.
+
+    private boolean legalMove(ChessMove move){
+        // Need to add functionality for killed pieces
+        var startPosition = move.getStartPosition();
+        var endPosition = move.getEndPosition();
+        var piece = myBoard.getPiece(startPosition);
+        var color = piece.getTeamColor();
+        boolean answer;
+
+        //Check if the king is in check. If so, determine who is the kill piece and how to block/kill them
+
+        if (myBoard.isEmpty(endPosition.getRow(), endPosition.getColumn())){
+            myBoard.removePiece(startPosition);
+            myBoard.addPiece(endPosition, piece);
+            answer = isInCheck(color);
+            myBoard.addPiece(startPosition, piece);
+            myBoard.removePiece(endPosition);
+        }
+        else if (myBoard.isOppColor(endPosition.getRow(), endPosition.getColumn(), color)){
+            var enemyPosition = endPosition;
+            var enemyPiece = myBoard.getPiece(enemyPosition);
+            myBoard.removePiece(enemyPosition);
+            myBoard.removePiece(startPosition);
+            myBoard.addPiece(enemyPosition, piece);
+            answer = isInCheck(color);
+            myBoard.addPiece(startPosition, piece);
+            myBoard.removePiece(endPosition);
+            myBoard.addPiece(enemyPosition, enemyPiece);
+        }
+        else{
+            answer = true;
+        }
+        return !answer;
+    }
+
+
+
     /**
      * Determines if the given team is in check
      *
@@ -102,15 +148,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPosition = locateKing(teamColor);
-        for (int r = 1; r < 9; r++){
-            for (int c = 1; c < 9; c++){
-                if (!myBoard.isEmpty(r, c) && myBoard.isOppColor(r, c, teamColor)){
-                    ChessPosition enemyPosition = new ChessPosition(r, c);
-                    if (inCheckMove(kingPosition, enemyPosition)){return true;}}
+        if (teamColor == TeamColor.WHITE){
+            for (ChessPosition enemyPosition : blackPositions){
+                var enemyPiece = myBoard.getPiece(enemyPosition);
+                var enemyMoves = enemyPiece.pieceMoves(myBoard, enemyPosition);
+                for (ChessMove move : enemyMoves){
+                    if (move.contains(whiteKing)){
+                        return true;
+                    }
+                }
             }
+            return false;
         }
-        return false;
+        else{
+            for (ChessPosition enemyPosition : whitePositions){
+                var enemyPiece = myBoard.getPiece(enemyPosition);
+                var enemyMoves = enemyPiece.pieceMoves(myBoard, enemyPosition);
+                for (ChessMove move : enemyMoves){
+                    if (move.contains(blackKing)){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -120,11 +181,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingPosition = locateKing(teamColor);
         //Create an anyValidMoves function that checks ValidMoves for ALL pieces on a team
-
-        if (isInCheck(teamColor) && validMoves(kingPosition).isEmpty()){return true;}
-        return false;
     }
 
     /**
@@ -145,6 +202,24 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.myBoard = board;
+        whitePositions.clear();
+        blackPositions.clear();
+        for (int r=1; r<9; r++){
+            for (int c=1; c<9; c++){
+                if (myBoard.isEmpty(r,c)){
+                    continue;}
+                var piecePosition = new ChessPosition(r, c);
+                var piece = myBoard.getPiece(piecePosition);
+                if (piece.getTeamColor() == TeamColor.WHITE){
+                    whitePositions.add(piecePosition);
+                    if (piece.getPieceType() == ChessPiece.PieceType.KING){whiteKing = piecePosition;}
+                }
+                else{
+                    blackPositions.add(piecePosition);
+                    if (piece.getPieceType() == ChessPiece.PieceType.KING){blackKing = piecePosition;}
+                }
+            }
+        }
     }
 
     /**
@@ -156,29 +231,6 @@ public class ChessGame {
         return myBoard;
     }
 
-    public boolean inCheckMove(ChessPosition kingPosition, ChessPosition enemyPosition){
-        ChessPiece enemyPiece = myBoard.getPiece(enemyPosition);
-        var enemyMoves = enemyPiece.pieceMoves(myBoard, enemyPosition);
-        for (ChessMove move : enemyMoves){
-            if (move.contains(kingPosition)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private ChessPosition locateKing(TeamColor team){
-            for (int r = 1; r < 9; r++){
-                for (int c = 1; c < 9; c++){
-                    if (!myBoard.isEmpty(r, c) && myBoard.isSameColor(r, c, team)){
-                        var myPiece = (myBoard.getPiece(new ChessPosition(r,c)));
-                        if (myPiece.getPieceType() == ChessPiece.PieceType.KING){
-                            return new ChessPosition(r,c);
-                        }
-                    }
-                }
-            }
-    return null;}
 
     @Override
     public boolean equals(Object o) {
