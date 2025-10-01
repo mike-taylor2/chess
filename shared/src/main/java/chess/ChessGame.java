@@ -20,7 +20,6 @@ public class ChessGame {
     ChessPosition blackKing;
     List<ChessBoard> boardHistory = new ArrayList<>();
 
-    List<ChessPosition> positionsOfKillPieces = new ArrayList<>();
 
     public ChessGame() {
         myBoard.resetBoard();
@@ -94,13 +93,40 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        var validMoves = validMoves(move.getStartPosition());
+        var startPosition = move.getStartPosition();
+        var endPosition = move.getEndPosition();
+        var piece = myBoard.getPiece(startPosition);
+
+        if (myBoard.getPiece(startPosition) == null){throw new InvalidMoveException();}
+        var color = piece.getTeamColor();
+        var validMoves = validMoves(startPosition);
         if (!validMoves.contains(move)){throw new InvalidMoveException();}
+        if (color == TeamColor.WHITE && !whiteTurn){throw new InvalidMoveException();}
+        if (color == TeamColor.BLACK && whiteTurn){throw new InvalidMoveException();}
+
+        if (move.getPromotionPiece() != null) {piece = new ChessPiece(color, move.getPromotionPiece());}
+
+        if (myBoard.isEmpty(endPosition.getRow(), endPosition.getColumn())){
+            updatePositions(color, startPosition, endPosition);
+            myBoard.removePiece(startPosition);
+            myBoard.addPiece(endPosition, piece);
+        }
+        else {
+            var enemyPosition = endPosition;
+
+            updatePositions(color, startPosition, endPosition);
+            if (color == TeamColor.WHITE){blackPositions.remove(enemyPosition);}
+            else{whitePositions.remove(enemyPosition);}
+            myBoard.removePiece(enemyPosition);
+            myBoard.removePiece(startPosition);
+            myBoard.addPiece(endPosition, piece);
+        }
+
+        whiteTurn = !whiteTurn;
 
         // Need to check for promotion and include that in addPiece()
         // encapsulate addPiece() and removePiece()
         // Update black and white position arrays including accounting for when a piece is eliminated
-        // You must also keep track of KillPiece to know who could kill the king.
 
     }
 
