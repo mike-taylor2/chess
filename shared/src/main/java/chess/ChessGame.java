@@ -20,7 +20,7 @@ public class ChessGame {
     ChessPosition blackKing;
     List<ChessBoard> boardHistory = new ArrayList<>();
 
-    ChessPosition positionOfKillPiece = null;
+    List<ChessPosition> positionsOfKillPieces = new ArrayList<>();
 
     public ChessGame() {
         myBoard.resetBoard();
@@ -73,6 +73,10 @@ public class ChessGame {
 
         ChessPiece myPiece = myBoard.getPiece(startPosition);
         var allMoves = myPiece.pieceMoves(myBoard, startPosition);
+        if (isInCheck(myPiece.getTeamColor())){
+            findKillPieces(myPiece.getTeamColor());
+        }
+
         for (ChessMove move : allMoves){
             if (legalMove(move)){
                 myValidMoves.add(move);
@@ -137,6 +141,28 @@ public class ChessGame {
             answer = true;
         }
         return !answer;
+    }
+
+
+    private void findKillPieces(TeamColor team){
+        if (team == TeamColor.WHITE){
+            for (ChessPosition position : blackPositions){
+                var enemyPiece = myBoard.getPiece(position);
+                var enemyMoves = enemyPiece.pieceMoves(myBoard, position);
+                for (ChessMove move : enemyMoves){
+                    if (move.contains(whiteKing)){positionsOfKillPieces.add(move.getStartPosition());}
+                }
+            }
+        }
+        else{
+            for (ChessPosition position : whitePositions){
+                var enemyPiece = myBoard.getPiece(position);
+                var enemyMoves = enemyPiece.pieceMoves(myBoard, position);
+                for (ChessMove move : enemyMoves){
+                    if (move.contains(blackKing)){positionsOfKillPieces.add(move.getStartPosition());}
+                }
+            }
+        }
     }
 
 
