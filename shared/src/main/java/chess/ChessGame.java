@@ -114,8 +114,6 @@ public class ChessGame {
         var color = piece.getTeamColor();
         boolean answer;
 
-        //Check if the king is in check. If so, determine who is the kill piece and how to block/kill them
-
         if (myBoard.isEmpty(endPosition.getRow(), endPosition.getColumn())){
             updatePositions(color, startPosition, endPosition);
             myBoard.removePiece(startPosition);
@@ -147,30 +145,6 @@ public class ChessGame {
         }
         return !answer;
     }
-
-
-    private void findKillPieces(TeamColor team){
-        if (team == TeamColor.WHITE){
-            for (ChessPosition position : blackPositions){
-                var enemyPiece = myBoard.getPiece(position);
-                var enemyMoves = enemyPiece.pieceMoves(myBoard, position);
-                for (ChessMove move : enemyMoves){
-                    if (move.contains(whiteKing)){positionsOfKillPieces.add(move.getStartPosition());}
-                }
-            }
-        }
-        else{
-            for (ChessPosition position : whitePositions){
-                var enemyPiece = myBoard.getPiece(position);
-                var enemyMoves = enemyPiece.pieceMoves(myBoard, position);
-                for (ChessMove move : enemyMoves){
-                    if (move.contains(blackKing)){positionsOfKillPieces.add(move.getStartPosition());}
-                }
-            }
-        }
-    }
-
-
 
     /**
      * Determines if the given team is in check
@@ -249,7 +223,18 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)){
+            return false;
+        }
+        for (int r=1; r<9; r++){
+            for (int c=1; c<9; c++){
+                if (!myBoard.isEmpty(r,c) && myBoard.isSameColor(r,c,teamColor)){
+                    var position = new ChessPosition(r,c);
+                    if (!validMoves(position).isEmpty()) {return false;}
+                }
+            }
+        }
+        return true;
     }
 
     /**
