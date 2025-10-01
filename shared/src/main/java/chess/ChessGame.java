@@ -230,19 +230,15 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        //Create an anyValidMoves function that checks ValidMoves for ALL pieces on a team
-        if (teamColor == TeamColor.WHITE){
-            for (ChessPosition position : whitePositions){
-                if (!validMoves(position).isEmpty()) return false;
+        for (int r=1; r<9; r++){
+            for (int c=1; c<9; c++){
+                if (!myBoard.isEmpty(r,c) && myBoard.isSameColor(r,c,teamColor)){
+                    var position = new ChessPosition(r,c);
+                    if (!validMoves(position).isEmpty()) {return false;}
+                }
             }
-            return true;
         }
-        else{
-            for (ChessPosition position : blackPositions){
-                if (!validMoves(position).isEmpty()) return false;
-            }
-            return true;
-        }
+        return true;
     }
 
     /**
