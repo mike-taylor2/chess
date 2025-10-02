@@ -83,6 +83,22 @@ public class ChessBoard {
         return squares[r-1][c-1].getTeamColor() == color;
     }
 
+    public ChessBoard copy(){
+        var newChessBoard = new ChessBoard();
+        for (int r=1; r<9; r++){
+            for (int c=1; c<9; c++){
+                if (!isEmpty(r,c)){
+                    var oldCopy = getPiece(new ChessPosition(r,c));
+                    var pieceColor = oldCopy.getTeamColor();
+                    var pieceType = oldCopy.getPieceType();
+                    var newCopy = new ChessPiece(pieceColor, pieceType);
+                    newChessBoard.addPiece(new ChessPosition(r,c), newCopy);
+                }
+            }
+        }
+        return newChessBoard;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
