@@ -20,7 +20,6 @@ public class ChessGame {
     ChessPosition blackKing;
 //    List<ChessBoard> boardHistory = new ArrayList<>();
 
-
     public ChessGame() {
         myBoard.resetBoard();
         whiteKing = new ChessPosition(1,5);
