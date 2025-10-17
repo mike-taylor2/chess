@@ -48,20 +48,20 @@ public class ChessPiece {
         return type;
     }
 
-    public void switchPieceType(ChessPiece.PieceType promotion){
-        if (promotion == PieceType.BISHOP){
-            type = PieceType.BISHOP;
-        }
-        else if (promotion == PieceType.ROOK){
-            type = PieceType.ROOK;
-        }
-        else if (promotion == PieceType.KNIGHT){
-            type = PieceType.KNIGHT;
-        }
-        else if (promotion == PieceType.QUEEN){
-            type = PieceType.QUEEN;
-        }
-    }
+//    public void switchPieceType(ChessPiece.PieceType promotion){
+//        if (promotion == PieceType.BISHOP){
+//            type = PieceType.BISHOP;
+//        }
+//        else if (promotion == PieceType.ROOK){
+//            type = PieceType.ROOK;
+//        }
+//        else if (promotion == PieceType.KNIGHT){
+//            type = PieceType.KNIGHT;
+//        }
+//        else if (promotion == PieceType.QUEEN){
+//            type = PieceType.QUEEN;
+//        }
+//    }
 
     /**
      * Calculates all the positions a chess piece can move to

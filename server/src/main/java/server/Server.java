@@ -3,12 +3,14 @@ package server;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.UserService;
 
 import java.util.Map;
 
 public class Server {
 
     private final Javalin javalin;
+    private final UserService service
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
