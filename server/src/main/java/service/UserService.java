@@ -7,10 +7,10 @@ import model.*;
 
 public class UserService {
 
-    private final UserDataAccess dataAccess;
+    private final UserDataAccess userData;
 
     public UserService() {
-        this.dataAccess = new MemoryUserDataAccess();
+        this.userData = new MemoryUserDataAccess();
     }
 
     public RegisterResult register(RegisterRequest req) throws ResponseException, DataAccessException {
@@ -18,22 +18,26 @@ public class UserService {
             throw new ResponseException("Error: Empty field");
         }
         UserData user = new UserData(req.username(), req.password(), req.email());
-        return dataAccess.createUser(user);
+        return userData.createUser(user);
     }
 
     public LoginResult login(LoginRequest req) throws ResponseException, DataAccessException{
         if (req.username() == null || req.password() == null){
             throw new ResponseException("Error: Empty field");
         }
-        return dataAccess.loginUser(req.username(), req.password());
+        return userData.loginUser(req.username(), req.password());
     }
 
     public String logout(LogoutRequest req) throws DataAccessException{
-        return dataAccess.logoutUser(req.authToken());
+        return userData.deleteAuthToken(req.authToken());
     }
 
-    public UserDataAccess getDataAccess(){
-        return dataAccess;
+    public boolean verifyAuthData(String authToken){
+        return userData.verifyAuthData(authToken);
+    }
+
+    public UserDataAccess getUserData(){
+        return userData;
     }
 
 }

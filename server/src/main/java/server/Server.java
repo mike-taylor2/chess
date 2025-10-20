@@ -2,6 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.GameDataAccess;
+import dataaccess.UserDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
@@ -30,6 +32,7 @@ public class Server {
         javalin.post("user", this::register);
         javalin.post("session", this::login);
         javalin.delete("session", this::logout);
+        javalin.get("game", this::listGames);
 
         // Register your endpoints and exception handlers here.
 
@@ -92,6 +95,20 @@ public class Server {
         }
     }
 
+    private void listGames(Context ctx){
+        var serializer = new Gson();
+        ListGamesRequest req = new ListGamesRequest(ctx.header("authorization"));
+        if (userService.verifyAuthData(req.authToken())){
+            var result = gameService.listGames();
+            var answer = serializer.toJson(result);
+            ctx.status(200);
+            ctx.result(answer);
+        }
+        else{
+            ctx.status(401);
+            ctx.json(Map.of("error", "unauthorized"));
+        }
+    }
 
 
     public int run(int desiredPort) {

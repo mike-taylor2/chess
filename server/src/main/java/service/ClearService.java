@@ -8,8 +8,8 @@ public class ClearService {
     private final GameDataAccess gameData;
 
     public ClearService(UserService user, GameService game){
-        this.userData = user.getDataAccess();
-        this.gameData = game.getDataAccess();
+        this.userData = user.getUserData();
+        this.gameData = game.getGameData();
     }
 
     public String clear(){

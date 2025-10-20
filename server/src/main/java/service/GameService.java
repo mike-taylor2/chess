@@ -1,21 +1,23 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.GameDataAccess;
 import dataaccess.MemoryGameDataAccess;
-import dataaccess.MemoryUserDataAccess;
 import dataaccess.UserDataAccess;
-
-import java.util.ArrayList;
+import model.ListGamesRequest;
+import model.ListGamesResult;
 
 public class GameService {
-    private final GameDataAccess dataAccess;
+    private final GameDataAccess gameData;
 
     public GameService() {
-        this.dataAccess = new MemoryGameDataAccess();
+        this.gameData = new MemoryGameDataAccess();
     }
 
-    GameDataAccess getDataAccess(){
-        return dataAccess;
+    public GameDataAccess getGameData(){
+        return gameData;
+    }
+
+    public ListGamesResult listGames(){
+        return new ListGamesResult(gameData.listGames());
     }
 }

@@ -36,7 +36,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
         return new LoginResult(username, authToken);
     }
 
-    public String logoutUser(String authToken) throws DataAccessException {
+    public String deleteAuthToken(String authToken) throws DataAccessException {
         for (AuthData a : usernameTokenList){
             if (a.authToken().equals(authToken)){
                 usernameTokenList.remove(a);
@@ -46,14 +46,13 @@ public class MemoryUserDataAccess implements UserDataAccess {
         throw new DataAccessException("Error: unauthorized");
     }
 
-    public AuthData getAuthData(UserData user) throws DataAccessException{
-        var username = user.username();
+    public boolean verifyAuthData(String authToken){
         for (AuthData a : usernameTokenList){
-            if (a.username().equals(username)){
-                return a;
+            if (a.authToken().equals(authToken)){
+                return true;
             }
         }
-        throw new DataAccessException("Error: token does not exist");
+        return false;
     }
 
     public void clear(){
