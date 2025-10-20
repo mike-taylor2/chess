@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
-import model.LoginRequest;
-import model.RegisterRequest;
-import model.RegisterResult;
-import model.UserData;
+import model.*;
 import service.ClearService;
 import service.GameService;
 import service.ResponseException;
@@ -32,6 +29,7 @@ public class Server {
         javalin.delete("db", this::clear);
         javalin.post("user", this::register);
         javalin.post("session", this::login);
+        javalin.delete("session", this::logout);
 
         // Register your endpoints and exception handlers here.
 
@@ -79,6 +77,19 @@ public class Server {
         var answer = clearService.clear();
         ctx.status(200);
         ctx.result(answer);
+    }
+
+    private void logout(Context ctx){
+        LogoutRequest req = new LogoutRequest(ctx.header("authorization"));
+        try{
+            var answer = userService.logout(req);
+            ctx.status(200);
+            ctx.result(answer);
+        }
+        catch (DataAccessException e){
+            ctx.status(401);
+            ctx.json(Map.of("error", e.getMessage()));
+        }
     }
 
 

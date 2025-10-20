@@ -36,8 +36,14 @@ public class MemoryUserDataAccess implements UserDataAccess {
         return new LoginResult(username, authToken);
     }
 
-    public String createAuthToken(){
-        return UUID.randomUUID().toString();
+    public String logoutUser(String authToken) throws DataAccessException {
+        for (AuthData a : usernameTokenList){
+            if (a.authToken().equals(authToken)){
+                usernameTokenList.remove(a);
+                return "{}";
+            }
+        }
+        throw new DataAccessException("Error: unauthorized");
     }
 
     public AuthData getAuthData(UserData user) throws DataAccessException{
@@ -55,18 +61,20 @@ public class MemoryUserDataAccess implements UserDataAccess {
         usernameTokenList.clear();
     }
 
+    private String createAuthToken(){
+        return UUID.randomUUID().toString();
+    }
+
     private boolean duplicatedUsername(UserData user){
         for (UserData u : userList){
-            if (u.equals(user)) return true;
+            if (u.equals(user)) {return true;}
         }
         return false;
     }
 
     private boolean unmatchedUsernamePassword(String username, String password){
         for (UserData u : userList){
-            if (u.username().equals(username) && u.password().equals(password)) {
-                return false;
-            }
+            if (u.username().equals(username) && u.password().equals(password)) {return false;}
         }
         return true;
     }

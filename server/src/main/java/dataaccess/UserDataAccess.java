@@ -5,6 +5,8 @@ import model.LoginResult;
 import model.RegisterResult;
 import model.UserData;
 
+import javax.xml.crypto.Data;
+
 public interface UserDataAccess {
 
     RegisterResult createUser(UserData user) throws DataAccessException;
@@ -12,6 +14,8 @@ public interface UserDataAccess {
     AuthData getAuthData(UserData user) throws DataAccessException;
 
     LoginResult loginUser(String username, String password) throws DataAccessException;
+
+    String logoutUser(String authToken) throws DataAccessException;
 
     void clear();
 }

@@ -28,6 +28,10 @@ public class UserService {
         return dataAccess.loginUser(req.username(), req.password());
     }
 
+    public String logout(LogoutRequest req) throws DataAccessException{
+        return dataAccess.logoutUser(req.authToken());
+    }
+
     public UserDataAccess getDataAccess(){
         return dataAccess;
     }
