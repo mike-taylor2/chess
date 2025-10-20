@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.UserDataAccess;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDataAccess;
 import model.*;
 
@@ -13,22 +12,22 @@ public class UserService {
         this.userData = new MemoryUserDataAccess();
     }
 
-    public RegisterResult register(RegisterRequest req) throws ResponseException, DataAccessException {
+    public RegisterResult register(RegisterRequest req) throws EmptyFieldException {
         if (req.username() == null || req.password() == null || req.email() == null){
-            throw new ResponseException("Error: Empty field");
+            throw new EmptyFieldException("Error: One or more fields are empty");
         }
         UserData user = new UserData(req.username(), req.password(), req.email());
         return userData.createUser(user);
     }
 
-    public LoginResult login(LoginRequest req) throws ResponseException, DataAccessException{
+    public LoginResult login(LoginRequest req) throws EmptyFieldException {
         if (req.username() == null || req.password() == null){
-            throw new ResponseException("Error: Empty field");
+            throw new EmptyFieldException("Error: One or more fields are empty");
         }
         return userData.loginUser(req.username(), req.password());
     }
 
-    public String logout(LogoutRequest req) throws DataAccessException{
+    public String logout(LogoutRequest req) throws UnauthorizedException{
         return userData.deleteAuthToken(req.authToken());
     }
 

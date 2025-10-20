@@ -1,16 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.GameDataAccess;
-import dataaccess.UserDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
-import service.ClearService;
-import service.GameService;
-import service.ResponseException;
-import service.UserService;
+import service.*;
 
 import java.util.Map;
 
@@ -28,11 +22,11 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        javalin.delete("db", this::clear);
-        javalin.post("user", this::register);
-        javalin.post("session", this::login);
-        javalin.delete("session", this::logout);
-        javalin.get("game", this::listGames);
+        javalin.delete("/db", this::clear);
+        javalin.post("/user", this::register);
+        javalin.post("/session", this::login);
+        javalin.delete("/session", this::logout);
+        javalin.get("/game", this::listGames);
 
         // Register your endpoints and exception handlers here.
 
@@ -47,13 +41,11 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (DataAccessException e){
-            ctx.status(403);
-            ctx.json(Map.of("error", e.getMessage()));
-        }
-        catch (ResponseException e){
-            ctx.status(400);
-            ctx.json(Map.of("error", e.getMessage()));
+        catch (EmptyFieldException | AlreadyTakenException e){
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
         }
     }
 
@@ -66,13 +58,11 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch(DataAccessException e){
-            ctx.status(401);
-            ctx.json(Map.of("error", e.getMessage()));
-        }
-        catch (ResponseException e){
-            ctx.status(400);
-            ctx.json(Map.of("error", e.getMessage()));
+        catch(EmptyFieldException | UnauthorizedException e){
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
         }
     }
 
@@ -84,14 +74,17 @@ public class Server {
 
     private void logout(Context ctx){
         LogoutRequest req = new LogoutRequest(ctx.header("authorization"));
+        var serializer = new Gson();
         try{
             var answer = userService.logout(req);
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (DataAccessException e){
-            ctx.status(401);
-            ctx.json(Map.of("error", e.getMessage()));
+        catch (UnauthorizedException e){
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
         }
     }
 
@@ -106,7 +99,9 @@ public class Server {
         }
         else{
             ctx.status(401);
-            ctx.json(Map.of("error", "unauthorized"));
+            var result = Map.of("message", "unauthorized");
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
         }
     }
 
