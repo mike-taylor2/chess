@@ -27,6 +27,7 @@ public class Server {
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
         javalin.get("/game", this::listGames);
+        javalin.post("/game", this::createGame);
 
         // Register your endpoints and exception handlers here.
 
@@ -112,7 +113,16 @@ public class Server {
             CreateGameRequest req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
             String authToken = ctx.header("authorization");
             userService.verifyAuthData(authToken);
-
+            var result = gameService.createGame(req);
+            var answer = serializer.toJson(result);
+            ctx.status(200);
+            ctx.result(answer);
+        }
+        catch (UnauthorizedException | EmptyFieldException e) {
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
         }
     }
 
