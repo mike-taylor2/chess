@@ -75,7 +75,7 @@ public class Server {
     private void logout(Context ctx){
         LogoutRequest req = new LogoutRequest(ctx.header("authorization"));
         var serializer = new Gson();
-        try{
+        try {
             var answer = userService.logout(req);
             ctx.status(200);
             ctx.result(answer);
@@ -91,17 +91,28 @@ public class Server {
     private void listGames(Context ctx){
         var serializer = new Gson();
         ListGamesRequest req = new ListGamesRequest(ctx.header("authorization"));
-        if (userService.verifyAuthData(req.authToken())){
+        try {
+            userService.verifyAuthData(req.authToken());
             var result = gameService.listGames();
             var answer = serializer.toJson(result);
             ctx.status(200);
             ctx.result(answer);
         }
-        else{
-            ctx.status(401);
-            var result = Map.of("message", "unauthorized");
+        catch (UnauthorizedException e) {
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
             var answer = serializer.toJson(result);
             ctx.json(answer);
+        }
+    }
+
+    private void createGame(Context ctx){
+        var serializer = new Gson();
+        try {
+            CreateGameRequest req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
+            String authToken = ctx.header("authorization");
+            userService.verifyAuthData(authToken);
+
         }
     }
 

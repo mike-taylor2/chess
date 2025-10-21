@@ -31,8 +31,10 @@ public class UserService {
         return userData.deleteAuthToken(req.authToken());
     }
 
-    public boolean verifyAuthData(String authToken){
-        return userData.verifyAuthData(authToken);
+    public void verifyAuthData(String authToken) throws UnauthorizedException{
+        if (!userData.verifyAuthData(authToken)){
+            throw new UnauthorizedException("Error: Unauthorized");
+        }
     }
 
     public UserDataAccess getUserData(){
