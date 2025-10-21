@@ -37,6 +37,10 @@ public class UserService {
         }
     }
 
+    public String getUsername(String authToken) {
+        return userData.getUsername(authToken);
+    }
+
     public UserDataAccess getUserData(){
         return userData;
     }

@@ -28,6 +28,7 @@ public class Server {
         javalin.delete("/session", this::logout);
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
+        javalin.put("/game", this::joinGame);
 
         // Register your endpoints and exception handlers here.
 
@@ -119,6 +120,25 @@ public class Server {
             ctx.result(answer);
         }
         catch (UnauthorizedException | EmptyFieldException e) {
+            ctx.status(e.getStatusCode());
+            var result = Map.of("message", e.getMessage());
+            var answer = serializer.toJson(result);
+            ctx.json(answer);
+        }
+    }
+
+    private void joinGame(Context ctx){
+        var serializer = new Gson();
+        try {
+            JoinGameRequest req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
+            String authToken = ctx.header("authorization");
+            userService.verifyAuthData(authToken);
+            var username = userService.getUsername(authToken);
+            var result = gameService.joinGame(req, username);
+            ctx.status(200);
+            ctx.result(result);
+        }
+        catch (UnauthorizedException | EmptyFieldException | AlreadyTakenException e){
             ctx.status(e.getStatusCode());
             var result = Map.of("message", e.getMessage());
             var answer = serializer.toJson(result);

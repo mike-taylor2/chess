@@ -15,5 +15,7 @@ public interface UserDataAccess {
 
     String deleteAuthToken(String authToken) throws UnauthorizedException;
 
+    String getUsername(String authToken);
+
     void clear();
 }

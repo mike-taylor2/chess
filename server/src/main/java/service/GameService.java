@@ -2,9 +2,7 @@ package service;
 
 import dataaccess.GameDataAccess;
 import dataaccess.MemoryGameDataAccess;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import model.ListGamesResult;
+import model.*;
 
 public class GameService {
     private final GameDataAccess gameData;
@@ -26,5 +24,10 @@ public class GameService {
             throw new EmptyFieldException("Error: must include game name");
         }
         return gameData.createGame(req.gameName());
+    }
+
+    public String joinGame(JoinGameRequest req, String username){
+        gameData.joinGame(req, username);
+        return "{}";
     }
 }

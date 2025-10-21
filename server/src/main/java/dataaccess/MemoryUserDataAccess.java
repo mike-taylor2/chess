@@ -60,6 +60,13 @@ public class MemoryUserDataAccess implements UserDataAccess {
         usernameTokenList.clear();
     }
 
+    public String getUsername(String authToken){
+        for (AuthData a : usernameTokenList){
+            if (a.authToken().equals(authToken)) return a.username();
+        }
+        return null;
+    }
+
     private String createAuthToken(){
         return UUID.randomUUID().toString();
     }
