@@ -17,5 +17,7 @@ public interface UserDataAccess {
 
     String getUsername(String authToken);
 
+    String getAuthToken(String username);
+
     void clear();
 }
