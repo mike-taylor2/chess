@@ -1,7 +1,5 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryUserDataAccess;
 import model.LoginRequest;
 import model.LogoutRequest;
 import model.RegisterRequest;
@@ -60,5 +58,50 @@ class UserServiceTest {
         // Positive
         var req = new LogoutRequest(authToken);
         assertEquals("{}", userService.logout(req));
+    }
+
+    @Test
+    void verifyAuthData() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        var authToken = userService.getUserData().getAuthToken(registerReq.username());
+
+        // Positive
+        assertDoesNotThrow(() -> userService.verifyAuthData(authToken));
+        // Negative
+        assertThrows(UnauthorizedException.class, () -> userService.verifyAuthData("This is a fake authToken"));
+    }
+
+    @Test
+    void getUsername() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        var authToken = userService.getUserData().getAuthToken(registerReq.username());
+
+        // Positive
+        assertEquals("mike", userService.getUsername(authToken));
+        // Negative
+        assertNotEquals("mike", userService.getUsername("This is a fake token"));
+    }
+
+    @Test
+    void getUserData() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        var authToken = userService.getUserData().getAuthToken(registerReq.username());
+
+        // Positive (shows data exists)
+        assertEquals("mike", userService.getUsername(authToken));
+
+        userService.getUserData().clear();
+
+        // Negative (shows data is gone)
+        assertThrows(UnauthorizedException.class, () -> userService.logout(new LogoutRequest(authToken)));
     }
 }

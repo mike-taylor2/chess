@@ -75,4 +75,30 @@ class GameServiceTest {
         // Negative test
         assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(new JoinGameRequest("WHITE", 1001), username3));
     }
+
+    @Test
+    void getGameData() {
+        var userService = new UserService();
+        var gameService = new GameService();
+
+        // Register User
+        var registerReq = new RegisterRequest("mike", "1234", "m@ofidsjfo.com");
+        userService.register(registerReq);
+
+        //Create Game in Server
+        var game = gameService.createGame(new CreateGameRequest("myGame"));
+
+        //Create Game to test locally
+        var game1 = new GameData(1001, null, null, "myGame", new ChessGame());
+        ArrayList<GameData> gameList = new ArrayList<>();
+        gameList.add(game1);
+
+        // Positive test
+        assertEquals(gameList, gameService.getGameData().listGames());
+
+        gameService.getGameData().clear();
+
+        // Negative test: Shows data is gone
+        assertNotEquals(gameList, gameService.getGameData().listGames());
+    }
 }
