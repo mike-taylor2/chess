@@ -92,9 +92,9 @@ public class Server {
 
     private void listGames(Context ctx){
         var serializer = new Gson();
-        ListGamesRequest req = new ListGamesRequest(ctx.header("authorization"));
+        var authToken = ctx.header("authorization");
         try {
-            userService.verifyAuthData(req.authToken());
+            userService.verifyAuthData(authToken);
             var result = gameService.listGames();
             var answer = serializer.toJson(result);
             ctx.status(200);
