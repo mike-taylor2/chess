@@ -44,10 +44,7 @@ public class Server {
             ctx.result(answer);
         }
         catch (EmptyFieldException | AlreadyTakenException e){
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+            exceptionHandler(ctx, e);
         }
     }
 
@@ -60,11 +57,8 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch(EmptyFieldException | UnauthorizedException e){
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+        catch (EmptyFieldException | UnauthorizedException e){
+            exceptionHandler(ctx, e);
         }
     }
 
@@ -76,17 +70,13 @@ public class Server {
 
     private void logout(Context ctx){
         LogoutRequest req = new LogoutRequest(ctx.header("authorization"));
-        var serializer = new Gson();
         try {
             var answer = userService.logout(req);
             ctx.status(200);
             ctx.result(answer);
         }
         catch (UnauthorizedException e){
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+            exceptionHandler(ctx, e);
         }
     }
 
@@ -101,10 +91,7 @@ public class Server {
             ctx.result(answer);
         }
         catch (UnauthorizedException e) {
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+            exceptionHandler(ctx, e);
         }
     }
 
@@ -120,10 +107,7 @@ public class Server {
             ctx.result(answer);
         }
         catch (UnauthorizedException | EmptyFieldException e) {
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+            exceptionHandler(ctx, e);
         }
     }
 
@@ -139,11 +123,16 @@ public class Server {
             ctx.result(result);
         }
         catch (UnauthorizedException | EmptyFieldException | AlreadyTakenException e){
-            ctx.status(e.getStatusCode());
-            var result = Map.of("message", e.getMessage());
-            var answer = serializer.toJson(result);
-            ctx.json(answer);
+            exceptionHandler(ctx, e);
         }
+    }
+
+    private void exceptionHandler(Context ctx, ResponseException e){
+        var serializer = new Gson();
+        ctx.status(e.getStatusCode());
+        var result = Map.of("message", e.getMessage());
+        var answer = serializer.toJson(result);
+        ctx.json(answer);
     }
 
 
