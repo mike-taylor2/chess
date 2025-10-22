@@ -100,7 +100,7 @@ public class RookMoveCalculator extends PieceMoveCalculator{
         x = position.getRow();
     }
 
-    public List<ChessMove> CalculateMoves(){
+    public List<ChessMove> calculateMoves(){
         quadOne();
         quadTwo();
         quadThree();

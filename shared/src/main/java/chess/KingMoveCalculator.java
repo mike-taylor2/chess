@@ -85,7 +85,7 @@ public class KingMoveCalculator extends PieceMoveCalculator {
         }
     }
 
-    public List<ChessMove> CalculateMoves(){
+    public List<ChessMove> calculateMoves(){
         quadOne();
         quadTwo();
         quadThree();

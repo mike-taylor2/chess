@@ -12,12 +12,18 @@ class UserServiceTest {
     @Test
     void register() {
         var userService = new UserService();
-
-        // Positive
         var req = new RegisterRequest("mikedotcom", "1234", "m@gmoil.com");
         var res = userService.register(req);
+
+        // Positive
         assertDoesNotThrow(() -> res);
         assertNotNull(res.authToken());
+
+
+    }
+    @Test
+    void nRegister() {
+        var userService = new UserService();
 
         // Negative
         var nReq = new RegisterRequest("dotcom", null, "m@gmoil.com");
@@ -34,13 +40,24 @@ class UserServiceTest {
 
         // Positive
         var req = new LoginRequest("mike", "1234");
-        var res = userService.login(req);
-        assertEquals("mike", res.username());
+        assertEquals("mike", userService.login(req).username());
+
+    }
+
+    @Test
+    void nLogin() {
+        //Register a user, then logs out
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        userService.logout(new LogoutRequest(userService.getUserData().getAuthToken(registerReq.username())));
 
         // Negative (Wrong password)
         var nReq = new LoginRequest("mike", "123429");
         assertThrows(UnauthorizedException.class, () -> userService.login(nReq));
     }
+
+
 
     @Test
     void logout() {
@@ -50,15 +67,24 @@ class UserServiceTest {
         userService.register(registerReq);
         var authToken = userService.getUserData().getAuthToken(registerReq.username());
 
-        // Negative (Note, I did the negative test first so I wouldn't have to re-register before attempting another test)
-        var nAuthToken = "This is a token that will fail";
-        var nReq = new LogoutRequest(nAuthToken);
-        assertThrows(UnauthorizedException.class, () -> userService.logout(nReq));
-
         // Positive
         var req = new LogoutRequest(authToken);
         assertEquals("{}", userService.logout(req));
     }
+
+    @Test
+    void nLogout() {
+        //Register a user
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+
+        // Negative
+        var nAuthToken = "This is a token that will fail";
+        var nReq = new LogoutRequest(nAuthToken);
+        assertThrows(UnauthorizedException.class, () -> userService.logout(nReq));
+    }
+
 
     @Test
     void verifyAuthData() {
@@ -70,6 +96,17 @@ class UserServiceTest {
 
         // Positive
         assertDoesNotThrow(() -> userService.verifyAuthData(authToken));
+
+    }
+
+    @Test
+    void nVerifyAuthData() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        var authToken = userService.getUserData().getAuthToken(registerReq.username());
+
         // Negative
         assertThrows(UnauthorizedException.class, () -> userService.verifyAuthData("This is a fake authToken"));
     }
@@ -84,6 +121,15 @@ class UserServiceTest {
 
         // Positive
         assertEquals("mike", userService.getUsername(authToken));
+    }
+
+    @Test
+    void nGetUsername() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+
         // Negative
         assertNotEquals("mike", userService.getUsername("This is a fake token"));
     }
@@ -97,11 +143,19 @@ class UserServiceTest {
         var authToken = userService.getUserData().getAuthToken(registerReq.username());
 
         // Positive (shows data exists)
-        assertEquals("mike", userService.getUsername(authToken));
+        assertEquals("mike", userService.getUserData().getUsername(authToken));
 
-        userService.getUserData().clear();
+    }
+
+    @Test
+    void nGetUserData() {
+        // Register User
+        var userService = new UserService();
+        var registerReq = new RegisterRequest("mike", "1234", "m@gmail.com");
+        userService.register(registerReq);
+        var authToken = userService.getUserData().getAuthToken(registerReq.username());
 
         // Negative (shows data is gone)
-        assertThrows(UnauthorizedException.class, () -> userService.logout(new LogoutRequest(authToken)));
+        assertNotEquals("joe", userService.getUserData().getUsername(authToken));
     }
 }

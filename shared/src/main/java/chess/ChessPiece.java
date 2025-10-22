@@ -48,21 +48,6 @@ public class ChessPiece {
         return type;
     }
 
-//    public void switchPieceType(ChessPiece.PieceType promotion){
-//        if (promotion == PieceType.BISHOP){
-//            type = PieceType.BISHOP;
-//        }
-//        else if (promotion == PieceType.ROOK){
-//            type = PieceType.ROOK;
-//        }
-//        else if (promotion == PieceType.KNIGHT){
-//            type = PieceType.KNIGHT;
-//        }
-//        else if (promotion == PieceType.QUEEN){
-//            type = PieceType.QUEEN;
-//        }
-//    }
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -77,32 +62,32 @@ public class ChessPiece {
 
         if (piece.getPieceType() == PieceType.BISHOP) {
             BishopMoveCalculator myBishopMoves = new BishopMoveCalculator(board, piece, myPosition);
-            myMoves = myBishopMoves.CalculateMoves();
+            myMoves = myBishopMoves.calculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.KING){
             KingMoveCalculator myKingMoves = new KingMoveCalculator(board, piece, myPosition);
-            myMoves = myKingMoves.CalculateMoves();
+            myMoves = myKingMoves.calculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.KNIGHT){
             KnightMoveCalculator myKnightMoves = new KnightMoveCalculator(board, piece, myPosition);
-            myMoves = myKnightMoves.CalculateMoves();
+            myMoves = myKnightMoves.calculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.QUEEN){
             QueenMoveCalculator myQueenMoves = new QueenMoveCalculator(board, piece, myPosition);
-            myMoves = myQueenMoves.CalculateMoves();
+            myMoves = myQueenMoves.calculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.ROOK){
             RookMoveCalculator myRookMoves = new RookMoveCalculator(board, piece, myPosition);
-            myMoves = myRookMoves.CalculateMoves();
+            myMoves = myRookMoves.calculateMoves();
         }
 
         else if (piece.getPieceType() == PieceType.PAWN){
             PawnMoveCalculator myPawnMoves = new PawnMoveCalculator(board, piece, myPosition);
-            myMoves = myPawnMoves.CalculateMoves();
+            myMoves = myPawnMoves.calculateMoves();
         }
         return myMoves;
     }

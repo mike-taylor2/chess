@@ -13,7 +13,7 @@ public class KnightMoveCalculator {
 
     List<ChessMove> myMoves = new ArrayList<>();
 
-    List<List<Integer>> MovementCombos = Arrays.asList(
+    List<List<Integer>> movementCombos = Arrays.asList(
             Arrays.asList(1, 2),
             Arrays.asList(2, 1),
             Arrays.asList(2, -1),
@@ -36,8 +36,8 @@ public class KnightMoveCalculator {
         return (0<x && x<9 && 0<y && y<9);
     }
 
-    List<ChessMove> CalculateMoves(){
-        for (List<Integer> pair : MovementCombos){
+    List<ChessMove> calculateMoves(){
+        for (List<Integer> pair : movementCombos){
             x = position.getRow() + pair.get(0);
             y = position.getColumn() + pair.get(1);
             if (inBounds(x, y) && (board.isEmpty(x, y) || board.isOppColor(x, y, piece.getTeamColor()))){

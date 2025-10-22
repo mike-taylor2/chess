@@ -109,7 +109,7 @@ public class PawnMoveCalculator {
 
 
 
-    public List<ChessMove> CalculateMoves(){
+    public List<ChessMove> calculateMoves(){
         if (isWhite()){
             checkWhiteJump();
             checkWhiteLeap();

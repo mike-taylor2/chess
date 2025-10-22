@@ -62,14 +62,14 @@ public class MemoryUserDataAccess implements UserDataAccess {
 
     public String getUsername(String authToken){
         for (AuthData a : usernameTokenList){
-            if (a.authToken().equals(authToken)) return a.username();
+            if (a.authToken().equals(authToken)) {return a.username();}
         }
         return null;
     }
 
     public String getAuthToken(String username){
         for (AuthData a : usernameTokenList){
-            if (a.username().equals(username)) return a.authToken();
+            if (a.username().equals(username)) {return a.authToken();}
         }
         return null;
     }

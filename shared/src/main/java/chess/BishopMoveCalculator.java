@@ -104,7 +104,7 @@ public class BishopMoveCalculator extends PieceMoveCalculator{
         }
     }
 
-    public List<ChessMove> CalculateMoves(){
+    public List<ChessMove> calculateMoves(){
         quadOne();
         quadTwo();
         quadThree();

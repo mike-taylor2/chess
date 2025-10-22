@@ -16,9 +16,9 @@ public class QueenMoveCalculator {
         this.position = position;
     }
 
-    List<ChessMove> CalculateMoves(){
-        List<ChessMove> axisMoves = new RookMoveCalculator(board, piece, position).CalculateMoves();
-        List<ChessMove> diagonalMoves = new BishopMoveCalculator(board, piece, position).CalculateMoves();
+    List<ChessMove> calculateMoves(){
+        List<ChessMove> axisMoves = new RookMoveCalculator(board, piece, position).calculateMoves();
+        List<ChessMove> diagonalMoves = new BishopMoveCalculator(board, piece, position).calculateMoves();
 
         myMoves.addAll(axisMoves);
         myMoves.addAll(diagonalMoves);

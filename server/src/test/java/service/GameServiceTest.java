@@ -15,8 +15,7 @@ class GameServiceTest {
         var gameService = new GameService();
 
         // Positive
-        var res = gameService.createGame(new CreateGameRequest("myGame"));
-        assertEquals(1001, res.gameID());
+        assertEquals(1001, gameService.createGame(new CreateGameRequest("myGame")).gameID());
 
         // Negative
         assertThrows(EmptyFieldException.class, () -> gameService.createGame(new CreateGameRequest(null)));
@@ -40,13 +39,12 @@ class GameServiceTest {
         gameList.add(game3);
 
         // Positive
-        var res = gameService.listGames();
-        assertEquals(res, new ListGamesResult(gameList));
+        assertEquals(gameService.listGames(), new ListGamesResult(gameList));
 
         // Negative
         var fakeGame = new GameData(1000001, null, null, "fakeGame", new ChessGame());
         gameList.add(fakeGame);
-        assertNotEquals(res, new ListGamesResult(gameList));
+        assertNotEquals(gameService.listGames(), new ListGamesResult(gameList));
     }
 
     @Test
