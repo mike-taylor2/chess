@@ -1,7 +1,11 @@
 package dataaccess;
 
+import service.ResponseException;
+
 import java.sql.*;
 import java.util.Properties;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DatabaseManager {
     private static String databaseName;
@@ -20,12 +24,14 @@ public class DatabaseManager {
      * Creates the database if it does not already exist.
      */
     static public void createDatabase() throws DataAccessException {
-        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
+        try {
+            String statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+            Connection conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+            try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to create database", e);
         }
     }
 
