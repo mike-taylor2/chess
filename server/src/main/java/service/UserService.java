@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.MySqlUserDataAccess;
 import dataaccess.UserDataAccess;
 import dataaccess.MemoryUserDataAccess;
 import model.*;
@@ -9,7 +10,7 @@ public class UserService {
     private final UserDataAccess userData;
 
     public UserService() {
-        this.userData = new MemoryUserDataAccess();
+        this.userData = new MySqlUserDataAccess();
     }
 
     public RegisterResult register(RegisterRequest req) throws EmptyFieldException {

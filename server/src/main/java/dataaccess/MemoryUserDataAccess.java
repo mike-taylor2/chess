@@ -46,7 +46,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
         throw new UnauthorizedException("Error: Not authorized");
     }
 
-    public boolean verifyAuthData(String authToken){
+     public boolean verifyAuthData(String authToken){
         for (AuthData a : usernameTokenList){
             if (a.authToken().equals(authToken)){
                 return true;
