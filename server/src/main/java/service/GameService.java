@@ -2,13 +2,14 @@ package service;
 
 import dataaccess.GameDataAccess;
 import dataaccess.MemoryGameDataAccess;
+import dataaccess.MySqlGameDataAccess;
 import model.*;
 
 public class GameService {
     private final GameDataAccess gameData;
 
     public GameService() {
-        this.gameData = new MemoryGameDataAccess();
+        this.gameData = new MySqlGameDataAccess();
     }
 
     public GameDataAccess getGameData(){

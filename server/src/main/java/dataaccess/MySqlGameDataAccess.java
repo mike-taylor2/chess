@@ -1,36 +1,77 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.CreateGameResult;
 import model.GameData;
 import model.JoinGameRequest;
 import service.AlreadyTakenException;
 import service.EmptyFieldException;
+import service.ResponseException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MySqlGameDataAccess implements GameDataAccess{
+    Integer gameID = 1001;
 
-    MySqlGameDataAccess(){
+    public MySqlGameDataAccess(){
         configureDataBase();
     }
 
-    void clear(){
-
+    public void clear(){
+        var statement = "TRUNCATE GameData";
+        executeUpdate(statement);
     }
 
-    ArrayList<GameData> listGames(){
-
+    public ArrayList<GameData> listGames(){
+        ArrayList<GameData> gameList = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM gameData";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        gameList.add(readGame(rs));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: unable to execute query", e);
+        }
+        return gameList;
     }
 
-    CreateGameResult createGame(String gameName){
-
+    public CreateGameResult createGame(String gameName){
+        int gameID = this.gameID;
+        this.gameID += 1;
+        String json = new Gson().toJson(new ChessGame());
+        var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
+        executeUpdate(statement, gameID, null, null, gameName, json);
+        return new CreateGameResult(gameID);
     }
 
-    void joinGame(JoinGameRequest req, String username){
-
+    public void joinGame(JoinGameRequest req, String username){
+        GameData game = findGame(req.gameID());
+        if (req.playerColor() == null){
+            throw new EmptyFieldException("Error: PlayerColor field is empty");
+        }
+        if (!(req.playerColor().equals("WHITE") || req.playerColor().equals("BLACK"))) {
+            throw new EmptyFieldException("Error: PlayerColor field is empty");
+        }
+        if (req.playerColor().equals("WHITE") && game.whiteUsername() == null) {
+            var joinedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+            editGame(game, joinedGame);
+        }
+        else if (req.playerColor().equals("BLACK") && game.blackUsername() == null) {
+            var joinedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+            editGame(game, joinedGame);
+        }
+        else {
+            throw new AlreadyTakenException("Error: Selected color was already taken");
+        }
     }
 
     private final String[] createStatements = {
@@ -71,12 +112,59 @@ public class MySqlGameDataAccess implements GameDataAccess{
         } catch (SQLException e) {
             switch (e.getErrorCode()){
                 case 1062:
-                    throw new AlreadyTakenException("Error: Username is already taken");
+                    throw new AlreadyTakenException("Error: Name is already taken");
                 case 1048:
                     throw new EmptyFieldException("Error: One of the fields is empty");
                 default:
                     throw new DataAccessException("Error: Unable to execute query", e);
             }
         }
+    }
+
+    private GameData readGame(ResultSet rs) throws DataAccessException{
+        try{
+            var gameID = rs.getInt("gameID");
+            var whiteUsername = rs.getString("whiteUsername");
+            var blackUsername = rs.getString("blackUsername");
+            var gameName = rs.getString("gameName");
+            var json = rs.getString("json");
+            var ChessGame = new Gson().fromJson(json, ChessGame.class);
+            return new GameData(gameID, whiteUsername, blackUsername, gameName, ChessGame);
+        }
+        catch (SQLException e) {
+            throw new DataAccessException("Error: Unable to execute query", e);
+        }
+    }
+
+    private void editGame(GameData oldGame, GameData newGame) {
+        var statement1 = "DELETE FROM gameData WHERE gameID=?";
+        executeUpdate(statement1, oldGame.gameID());
+        var statement2 = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
+        var json = new Gson().toJson(oldGame.game());
+        executeUpdate(statement2, newGame.gameID(), newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json);
+    }
+
+    private GameData findGame(int gameID){
+        var statement = "SELECT gameID, whiteUsername, blackUsername, " +
+                        "gameName, json FROM gameData WHERE gameID=?";
+        var rs = getGameInDatabase(statement, gameID);
+        return readGame(rs);
+    }
+
+    private ResultSet getGameInDatabase(String statement, int gameID){
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs;
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            throw new DataAccessException("Error: game not found", e);
+        }
+        throw new ResponseException("Error: game not found", 500);
     }
 }
