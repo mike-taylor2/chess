@@ -23,6 +23,9 @@ public class MySqlUserDataAccess implements UserDataAccess {
     }
 
     public RegisterResult createUser(UserData user) throws UnauthorizedException {
+        if (getAuthToken(user.username()) != null){
+            throw new AlreadyTakenException("Error: username already taken");
+        }
         var userDataStatement = "INSERT INTO UserData (Username, Password, Email) VALUES (?, ?, ?)";
         var securedPassword = generateHashedPassword(user.password());
         executeUpdate(userDataStatement, user.username(), securedPassword, user.email());
@@ -78,7 +81,7 @@ public class MySqlUserDataAccess implements UserDataAccess {
             executeUpdate(statement2);
         }
         catch (DataAccessException e) {
-            System.out.println(e.getMessage());
+            throw new DataAccessException("Error: unable to execute query", e);
         }
 
     }
@@ -118,10 +121,6 @@ public class MySqlUserDataAccess implements UserDataAccess {
             }
         } catch (SQLException e) {
             switch (e.getErrorCode()){
-                case 1062:
-                    throw new AlreadyTakenException("Error: Username is already taken");
-                case 1048:
-                    throw new EmptyFieldException("Error: One of the fields is empty");
                 default:
                     throw new DataAccessException("Error: Unable to execute query", e);
             }
@@ -155,10 +154,13 @@ public class MySqlUserDataAccess implements UserDataAccess {
                         return rs.getString(String.format("%s", type));
                     }
                 }
+                catch (Exception e){
+                    return null;
+                }
             }
         }
         catch (Exception e) {
-            return null;
+            throw new DataAccessException("Error: failed to connect to db", e);
         }
         return null;
     }

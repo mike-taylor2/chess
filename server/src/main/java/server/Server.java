@@ -64,9 +64,15 @@ public class Server {
     }
 
     private void clear(Context ctx){
-        var answer = clearService.clear();
-        ctx.status(200);
-        ctx.result(answer);
+        try{
+            var answer = clearService.clear();
+            ctx.status(200);
+            ctx.result(answer);
+        }
+        catch (DataAccessException e){
+            exceptionHandler(ctx, e);
+        }
+
     }
 
     private void logout(Context ctx){

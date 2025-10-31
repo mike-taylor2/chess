@@ -112,14 +112,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
-            switch (e.getErrorCode()){
-                case 1062:
-                    throw new AlreadyTakenException("Error: Name is already taken");
-                case 1048:
-                    throw new EmptyFieldException("Error: One of the fields is empty");
-                default:
-                    throw new DataAccessException("Error: Unable to execute query", e);
-            }
+            throw new DataAccessException("Error: Unable to execute query", e);
         }
     }
 

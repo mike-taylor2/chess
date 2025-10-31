@@ -35,18 +35,6 @@ public class DatabaseManager {
         }
     }
 
-//    static public void deleteDatabase() {
-//        try {
-//            String statement = "DROP DATABASE IF EXISTS " + databaseName;
-//            Connection conn = getConnection();
-//            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)){
-//                preparedStatement.executeUpdate();
-//            }
-//        } catch (SQLException e) {
-//            throw new DataAccessException("Error: Failed to delete database ", e);
-//        }
-//    }
-
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
@@ -66,7 +54,7 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get connection", ex);
+            throw new DataAccessException("Error: failed to get connection", ex);
         }
     }
 
