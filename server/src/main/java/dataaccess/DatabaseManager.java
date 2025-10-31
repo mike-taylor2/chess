@@ -27,25 +27,25 @@ public class DatabaseManager {
         try {
             String statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
             Connection conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-            try (PreparedStatement preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to create database", e);
+            throw new DataAccessException("Failed to create database ", e);
         }
     }
 
-    static public void deleteDatabase() {
-        try {
-            String statement = "DROP DATABASE IF EXISTS" + databaseName;
-            Connection conn = getConnection();
-            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)){
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error: Failed to delete database", e);
-        }
-    }
+//    static public void deleteDatabase() {
+//        try {
+//            String statement = "DROP DATABASE IF EXISTS " + databaseName;
+//            Connection conn = getConnection();
+//            try (PreparedStatement preparedStatement = conn.prepareStatement(statement)){
+//                preparedStatement.executeUpdate();
+//            }
+//        } catch (SQLException e) {
+//            throw new DataAccessException("Error: Failed to delete database ", e);
+//        }
+//    }
 
     /**
      * Create a connection to the database and sets the catalog based upon the

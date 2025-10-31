@@ -39,12 +39,12 @@ public class MySqlUserDataAccess implements UserDataAccess {
     }
 
     public LoginResult loginUser(String username, String password) throws UnauthorizedException{
-        var statement = "SELECT Username FROM UserData WHERE Password=?";
-        var verifiedUserPassword = getItemInDatabase(statement, username, "Username");
+        var statement = "SELECT Password FROM UserData WHERE Username=?";
+        var verifiedUserPassword = getItemInDatabase(statement, username, "Password");
         if (verifiedUserPassword == null){
             throw new UnauthorizedException("Error: Username does not exist");
         }
-        if (!verifiedUserPassword.equals(generateHashedPassword(password))){
+        if (!BCrypt.checkpw(password, verifiedUserPassword)){
             throw new UnauthorizedException("Error: Incorrect password");
         }
         String authToken = createAuthToken();
@@ -71,7 +71,16 @@ public class MySqlUserDataAccess implements UserDataAccess {
     }
 
     public void clear(){
-        DatabaseManager.deleteDatabase();
+        try {
+            var statement1 = "TRUNCATE UserData";
+            var statement2 = "TRUNCATE AuthData";
+            executeUpdate(statement1);
+            executeUpdate(statement2);
+        }
+        catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private String createAuthToken(){
@@ -84,15 +93,14 @@ public class MySqlUserDataAccess implements UserDataAccess {
               Username varchar(256) NOT NULL,
               Password varchar(256) NOT NULL,
               Email varchar(256) NOT NULL,
-              PRIMARY KEY (Username),
               INDEX(Username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            """,
+            """
             CREATE TABLE IF NOT EXISTS AuthData (
               authToken varchar(256) NOT NULL,
               Username varchar(256) NOT NULL,
-              PRIMARY KEY (Username),
-              INDEX(Username),
-              FOREIGN KEY (Username) REFERENCES UserData(Username)
+              INDEX(authToken)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """
     };
@@ -121,14 +129,14 @@ public class MySqlUserDataAccess implements UserDataAccess {
 
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Error: Unable to configure database", ex);
+            throw new DataAccessException(ex.toString(), ex);
         }
     }
 
