@@ -34,7 +34,7 @@ public class MySqlUserDataAccess implements UserDataAccess {
     }
 
     public boolean verifyAuthData(String authToken){
-        var statement = "SELECT Username FROM AuthData WHERE authToken=?";
+        var statement = "SELECT authToken FROM AuthData WHERE authToken=?";
         return null != getItemInDatabase(statement, authToken, "authToken");
     }
 
@@ -93,6 +93,7 @@ public class MySqlUserDataAccess implements UserDataAccess {
               Username varchar(256) NOT NULL,
               Password varchar(256) NOT NULL,
               Email varchar(256) NOT NULL,
+              PRIMARY KEY (Username),
               INDEX(Username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """,
@@ -100,6 +101,7 @@ public class MySqlUserDataAccess implements UserDataAccess {
             CREATE TABLE IF NOT EXISTS AuthData (
               authToken varchar(256) NOT NULL,
               Username varchar(256) NOT NULL,
+              PRIMARY KEY (authToken),
               INDEX(authToken)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """
