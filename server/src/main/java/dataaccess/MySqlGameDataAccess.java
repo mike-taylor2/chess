@@ -88,7 +88,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
             """};
 
 
-    public void configureDataBase() throws DataAccessException {
+    private void configureDataBase() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {

@@ -2,6 +2,8 @@ package service;
 
 import chess.ChessGame;
 import model.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,6 +11,14 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTest {
+
+    @BeforeEach
+    public void setup(){
+        var user = new UserService();
+        var game = new GameService();
+        var clearService = new ClearService(user, game);
+        clearService.clear();
+    }
 
     @Test
     void createGame() {

@@ -3,11 +3,21 @@ package service;
 import model.LoginRequest;
 import model.LogoutRequest;
 import model.RegisterRequest;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
+
+    @BeforeEach
+    public void setup(){
+        var user = new UserService();
+        var game = new GameService();
+        var clearService = new ClearService(user, game);
+        clearService.clear();
+    }
 
     @Test
     void register() {
