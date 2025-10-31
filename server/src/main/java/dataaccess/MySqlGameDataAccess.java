@@ -61,6 +61,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
         if (!(req.playerColor().equals("WHITE") || req.playerColor().equals("BLACK"))) {
             throw new EmptyFieldException("Error: PlayerColor field is empty");
         }
+
         if (req.playerColor().equals("WHITE") && game.whiteUsername() == null) {
             var joinedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
             editGame(game, joinedGame);
@@ -106,6 +107,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
                     Object param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param==null) ps.setString(i+1, null);
                 }
                 ps.executeUpdate();
             }
@@ -147,17 +149,16 @@ public class MySqlGameDataAccess implements GameDataAccess{
     private GameData findGame(int gameID){
         var statement = "SELECT gameID, whiteUsername, blackUsername, " +
                         "gameName, json FROM gameData WHERE gameID=?";
-        var rs = getGameInDatabase(statement, gameID);
-        return readGame(rs);
+        return getGameInDatabase(statement, gameID);
     }
 
-    private ResultSet getGameInDatabase(String statement, int gameID){
+    private GameData getGameInDatabase(String statement, int gameID){
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return rs;
+                        return readGame(rs);
                     }
                 }
             }
@@ -165,6 +166,6 @@ public class MySqlGameDataAccess implements GameDataAccess{
         catch (Exception e) {
             throw new DataAccessException("Error: game not found", e);
         }
-        throw new ResponseException("Error: game not found", 500);
+        throw new EmptyFieldException("Error: bad game ID");
     }
 }
