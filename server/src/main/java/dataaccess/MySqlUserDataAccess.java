@@ -53,7 +53,11 @@ public class MySqlUserDataAccess implements UserDataAccess {
         return new LoginResult(username,authToken);
     }
 
-    String deleteAuthToken(String authToken) throws UnauthorizedException{
+    public String deleteAuthToken(String authToken) throws UnauthorizedException{
+        if (!verifyAuthData(authToken)){throw new UnauthorizedException("Error: unauthorized action");}
+        var statement = "DELETE FROM AuthData WHERE authToken=?";
+        executeUpdate(statement, authToken);
+        return "{}";
     }
 
     String getUsername(String authToken){
