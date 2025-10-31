@@ -34,29 +34,26 @@ public class MySqlUserDataAccess implements UserDataAccess {
     }
 
     public boolean verifyAuthData(String authToken){
-        try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT Username FROM AuthData WHERE authToken=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                ps.setString(1, authToken);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return true;
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            return false;
-        }
-        return false;
+        var statement = "SELECT Username FROM AuthData WHERE authToken=?";
+        return null != getItemInDatabase(statement, authToken);
     }
 
-    LoginResult loginUser(String username, String password) throws UnauthorizedException{
-
+    public LoginResult loginUser(String username, String password) throws UnauthorizedException{
+        var statement = "SELECT Username FROM UserData WHERE Password=?";
+        var verifiedUserPassword = getItemInDatabase(statement, username);
+        if (verifiedUserPassword == null){
+            throw new UnauthorizedException("Error: Username does not exist");
+        }
+        if (!verifiedUserPassword.equals(generateHashedPassword(password))){
+            throw new UnauthorizedException("Error: Incorrect password");
+        }
+        String authToken = createAuthToken();
+        var authDataStatement = "INSERT INTO AuthData (authToken, Username) VALUES (?, ?)";
+        executeUpdate(authDataStatement, authToken, username);
+        return new LoginResult(username,authToken);
     }
 
     String deleteAuthToken(String authToken) throws UnauthorizedException{
-
     }
 
     String getUsername(String authToken){
@@ -130,5 +127,21 @@ public class MySqlUserDataAccess implements UserDataAccess {
 
     private String generateHashedPassword(String clearTextPassword){
         return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    }
+
+    private String getItemInDatabase(String statement, String item){
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, item);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString(String.format("%s", item));
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 }
