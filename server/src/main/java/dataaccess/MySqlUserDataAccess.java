@@ -35,12 +35,12 @@ public class MySqlUserDataAccess implements UserDataAccess {
 
     public boolean verifyAuthData(String authToken){
         var statement = "SELECT Username FROM AuthData WHERE authToken=?";
-        return null != getItemInDatabase(statement, authToken);
+        return null != getItemInDatabase(statement, authToken, "authToken");
     }
 
     public LoginResult loginUser(String username, String password) throws UnauthorizedException{
         var statement = "SELECT Username FROM UserData WHERE Password=?";
-        var verifiedUserPassword = getItemInDatabase(statement, username);
+        var verifiedUserPassword = getItemInDatabase(statement, username, "Username");
         if (verifiedUserPassword == null){
             throw new UnauthorizedException("Error: Username does not exist");
         }
@@ -60,15 +60,18 @@ public class MySqlUserDataAccess implements UserDataAccess {
         return "{}";
     }
 
-    String getUsername(String authToken){
-
+    public String getUsername(String authToken){
+        var statement = "SELECT authToken, Username FROM AuthData WHERE authToken=?";
+        return getItemInDatabase(statement, authToken, "Username");
     }
 
-    String getAuthToken(String username){
-
+    public String getAuthToken(String username){
+        var statement = "SELECT authToken, Username FROM AuthData WHERE Username=?";
+        return getItemInDatabase(statement, username, "authToken");
     }
 
-    void clear(){
+    public void clear(){
+        DatabaseManager.deleteDatabase();
     }
 
     private String createAuthToken(){
@@ -133,13 +136,13 @@ public class MySqlUserDataAccess implements UserDataAccess {
         return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
     }
 
-    private String getItemInDatabase(String statement, String item){
+    private String getItemInDatabase(String statement, String item, String type){
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, item);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return rs.getString(String.format("%s", item));
+                        return rs.getString(String.format("%s", type));
                     }
                 }
             }
@@ -147,5 +150,6 @@ public class MySqlUserDataAccess implements UserDataAccess {
         catch (Exception e) {
             return null;
         }
+        return null;
     }
 }

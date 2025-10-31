@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
@@ -43,7 +44,7 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (EmptyFieldException | AlreadyTakenException e){
+        catch (EmptyFieldException | AlreadyTakenException | DataAccessException e){
             exceptionHandler(ctx, e);
         }
     }
@@ -57,7 +58,7 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (EmptyFieldException | UnauthorizedException e){
+        catch (EmptyFieldException | UnauthorizedException | DataAccessException e){
             exceptionHandler(ctx, e);
         }
     }
@@ -75,7 +76,7 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (UnauthorizedException e){
+        catch (UnauthorizedException | DataAccessException e){
             exceptionHandler(ctx, e);
         }
     }
@@ -90,7 +91,7 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (UnauthorizedException e) {
+        catch (UnauthorizedException | DataAccessException e) {
             exceptionHandler(ctx, e);
         }
     }
@@ -106,7 +107,7 @@ public class Server {
             ctx.status(200);
             ctx.result(answer);
         }
-        catch (UnauthorizedException | EmptyFieldException e) {
+        catch (UnauthorizedException | EmptyFieldException | DataAccessException e) {
             exceptionHandler(ctx, e);
         }
     }
@@ -122,7 +123,7 @@ public class Server {
             ctx.status(200);
             ctx.result(result);
         }
-        catch (UnauthorizedException | EmptyFieldException | AlreadyTakenException e){
+        catch (UnauthorizedException | EmptyFieldException | AlreadyTakenException | DataAccessException e){
             exceptionHandler(ctx, e);
         }
     }
