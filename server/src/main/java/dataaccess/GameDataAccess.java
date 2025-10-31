@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface GameDataAccess {
     void clear();
+
     ArrayList<GameData> listGames();
 
     CreateGameResult createGame(String gameName);
