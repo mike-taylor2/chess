@@ -30,7 +30,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
     public ArrayList<GameData> listGames(){
         ArrayList<GameData> gameList = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM gameData";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM GameData";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
