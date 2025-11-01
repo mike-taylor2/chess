@@ -132,7 +132,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
     }
 
     private void editGame(GameData oldGame, GameData newGame) {
-        var statement1 = "DELETE FROM gameData WHERE gameID=?";
+        var statement1 = "DELETE FROM GameData WHERE gameID=?";
         executeUpdate(statement1, oldGame.gameID());
         var statement2 = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
         var json = new Gson().toJson(oldGame.game());
@@ -141,7 +141,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
 
     private GameData findGame(int gameID){
         var statement = "SELECT gameID, whiteUsername, blackUsername, " +
-                        "gameName, json FROM gameData WHERE gameID=?";
+                        "gameName, json FROM GameData WHERE gameID=?";
         return getGameInDatabase(statement, gameID);
     }
 
