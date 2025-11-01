@@ -105,9 +105,13 @@ public class MySqlGameDataAccess implements GameDataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param==null) ps.setString(i+1, null);
+                    if (param instanceof String p) {
+                        ps.setString(i + 1, p);}
+                    else if (param instanceof Integer p) {
+                        ps.setInt(i + 1, p);}
+                    else if (param==null) {
+                        ps.setString(i+1, null);
+                    }
                 }
                 ps.executeUpdate();
             }
@@ -123,8 +127,8 @@ public class MySqlGameDataAccess implements GameDataAccess{
             var blackUsername = rs.getString("blackUsername");
             var gameName = rs.getString("gameName");
             var json = rs.getString("json");
-            var ChessGame = new Gson().fromJson(json, ChessGame.class);
-            return new GameData(gameID, whiteUsername, blackUsername, gameName, ChessGame);
+            var chessGame = new Gson().fromJson(json, ChessGame.class);
+            return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
         }
         catch (SQLException e) {
             throw new DataAccessException("Error: Unable to execute query", e);
