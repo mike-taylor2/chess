@@ -18,31 +18,45 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest req) throws ResponseException {
-
+        var request = buildRequest("POST", "/user", req);
+        var response = sendRequest(request);
+        return handleResponse(response, RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest req) throws ResponseException {
-
+        var request = buildRequest("POST", "session", req);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
-    public String logout() throws ResponseException {
-
+    public void logout() throws ResponseException {
+        var request = buildRequest("DELETE", "/session", null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public ListGamesResult listGames() throws ResponseException {
-
+        var request = buildRequest("GET", "/game", null);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
     }
 
     public CreateGameResult createGame(CreateGameRequest req) throws ResponseException {
-
+        var request = buildRequest("POST", "/game", req);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResult.class);
     }
 
-    public String joinGame(JoinGameRequest req) throws ResponseException {
-
+    public void joinGame(JoinGameRequest req) throws ResponseException {
+        var request = buildRequest("PUT", "/game", req);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public String clear() throws ResponseException {
-
+    public void clear() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
