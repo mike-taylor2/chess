@@ -9,10 +9,12 @@ import java.util.Scanner;
 
 public class PreLoginUI {
     private final ServerFacade server;
+    private final PostLoginUI postUI;
 
 
     public PreLoginUI(ServerFacade server) {
         this.server = server;
+        postUI = new PostLoginUI(server);
     }
 
 
@@ -21,7 +23,7 @@ public class PreLoginUI {
         String result = "";
         Scanner scanner = new Scanner(System.in);
 
-        while (!result.contains("quit") || !result.contains("Success")) {
+        while (!result.contains("Terminating") || !result.contains("Success")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
@@ -33,6 +35,9 @@ public class PreLoginUI {
                 System.out.print(msg);
             }
         }
+        if (result.contains("Success")) {
+            postUI.run();
+        }
     }
 
     public String eval(String input) {
@@ -43,6 +48,7 @@ public class PreLoginUI {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
+                case "quit" -> quit();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -57,6 +63,10 @@ public class PreLoginUI {
                 - quit
                 - help
                 """;
+    }
+
+    public String quit() {
+        return "Terminating program";
     }
 
     public String register(String ... params) throws ResponseException {

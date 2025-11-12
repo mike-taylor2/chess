@@ -24,7 +24,7 @@ public class ServerFacade {
     }
 
     public LoginResult login(LoginRequest req) throws ResponseException {
-        var request = buildRequest("POST", "session", req);
+        var request = buildRequest("POST", "/session", req);
         var response = sendRequest(request);
         return handleResponse(response, LoginResult.class);
     }

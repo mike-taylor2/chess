@@ -9,6 +9,7 @@ public class ChessClient {
         preUI = new PreLoginUI(server);
     }
 
+
     public void run(){
         preUI.run();
     }
