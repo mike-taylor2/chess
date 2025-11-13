@@ -9,7 +9,7 @@ public class ChessClient {
         preUI = new PreLoginUI(server);
     }
 
-
+// Create code for application to fail if server isn't running
     public void run(){
         preUI.run();
     }

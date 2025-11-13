@@ -23,7 +23,7 @@ public class PreLoginUI {
         String result = "";
         Scanner scanner = new Scanner(System.in);
 
-        while (!result.contains("Terminating") || !result.contains("Success")) {
+        while (!result.contains("Terminating") && !result.contains("Success")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
@@ -71,17 +71,22 @@ public class PreLoginUI {
 
     public String register(String ... params) throws ResponseException {
         if (params.length < 3) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: missing username or password or email");
+            return "Error: missing username or password or email";
         }
         var user = new RegisterRequest(params[0], params[1], params[2]);
-        server.register(user);
-        server.login(new LoginRequest(params[0], params[1]));
+        try {
+            server.register(user);
+            server.login(new LoginRequest(params[0], params[1]));
+        }
+        catch (Exception e){
+            return e.getMessage();
+        }
         return "Success: Registered and Logged in";
     }
 
     public String login(String ... params) throws ResponseException {
         if (params.length < 2) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: missing username or password");
+            return "Error: missing username or password";
         }
         var user = new LoginRequest(params[0], params[1]);
         try {
@@ -89,7 +94,7 @@ public class PreLoginUI {
             return "Success: Logged in";
         }
         catch (Exception e) {
-            return "Error: wrong username or password";
+            return e.getMessage();
         }
     }
 
