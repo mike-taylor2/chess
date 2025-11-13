@@ -20,7 +20,7 @@ public class PostLoginUI {
         String result = "";
         Scanner scanner = new Scanner(System.in);
 
-        while (!result.contains("Joined")) {
+        while (!result.contains("Joined") && !result.contains("out")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
@@ -65,7 +65,7 @@ public class PostLoginUI {
                 case "list" -> listGames();
 //                case "join" -> joinGame(params);
 //                case "observe" -> observeGame(params);
-//                case "logout" -> logout(params);
+                case "logout" -> logout();
                 default -> help();
             };
         }
@@ -92,6 +92,16 @@ public class PostLoginUI {
         try {
             var gameList = server.listGames().games();
             return gameList.toString();
+        }
+        catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    public String logout() throws ResponseException {
+        try {
+            server.logout();
+            return "Success: Logged out" + "\n";
         }
         catch (Exception e) {
             return e.getMessage();
