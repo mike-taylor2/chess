@@ -62,7 +62,7 @@ public class PostLoginUI {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> createGame(params);
-//                case "list" -> listGames(params);
+                case "list" -> listGames();
 //                case "join" -> joinGame(params);
 //                case "observe" -> observeGame(params);
 //                case "logout" -> logout(params);
@@ -86,7 +86,16 @@ public class PostLoginUI {
         catch (Exception e) {
             return e.getMessage();
         }
+    }
 
+    public String listGames() throws ResponseException {
+        try {
+            var gameList = server.listGames().games();
+            return gameList.toString();
+        }
+        catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     private void printPrompt() {
