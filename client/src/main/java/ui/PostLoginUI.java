@@ -108,6 +108,10 @@ public class PostLoginUI {
         }
     }
 
+    public String join(String ... params) {
+
+    }
+
     private void printPrompt() {
         System.out.print("\n" + ">>> ");
     }

@@ -14,9 +14,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MySqlGameDataAccess implements GameDataAccess{
-    Integer gameID = 1001;
+    Random rand = new Random();
 
     public MySqlGameDataAccess(){
         configureDataBase();
@@ -45,8 +46,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
     }
 
     public CreateGameResult createGame(String gameName){
-        int gameID = this.gameID;
-        this.gameID += 1;
+        int gameID = rand.nextInt(9000) + 1000;
         String json = new Gson().toJson(new ChessGame());
         var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
         executeUpdate(statement, gameID, null, null, gameName, json);

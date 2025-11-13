@@ -8,10 +8,11 @@ import service.AlreadyTakenException;
 import service.EmptyFieldException;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MemoryGameDataAccess implements GameDataAccess{
     ArrayList<GameData> gameList = new ArrayList<>();
-    Integer gameID = 1001;
+    Random rand = new Random();
 
     public void clear(){
         gameList.clear();
@@ -22,8 +23,7 @@ public class MemoryGameDataAccess implements GameDataAccess{
     }
 
     public CreateGameResult createGame(String gameName){
-        int gameID = this.gameID;
-        this.gameID += 1;
+        int gameID = rand.nextInt(9000) + 1000;
         var chess = new ChessGame();
         var gameData = new GameData(gameID, null, null, gameName, chess);
         gameList.add(gameData);
