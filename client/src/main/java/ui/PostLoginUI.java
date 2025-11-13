@@ -2,6 +2,8 @@ package ui;
 
 import exception.ResponseException;
 import model.CreateGameRequest;
+import model.GameData;
+import model.JoinGameRequest;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -33,8 +35,10 @@ public class PostLoginUI {
             }
         }
         if (result.contains("game")) {
-            GameplayUI gameplayUI = new GameplayUI(server);
-            gameplayUI.run();
+            if (result.contains("BLACK")) {}
+            else {}
+//            GameplayUI gameplayUI = new GameplayUI(server);
+//            gameplayUI.run();
         }
         else {
             PreLoginUI preUI = new PreLoginUI(server);
@@ -63,8 +67,8 @@ public class PostLoginUI {
             return switch (cmd) {
                 case "create" -> createGame(params);
                 case "list" -> listGames();
-//                case "join" -> joinGame(params);
-//                case "observe" -> observeGame(params);
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
                 case "logout" -> logout();
                 default -> help();
             };
@@ -108,8 +112,43 @@ public class PostLoginUI {
         }
     }
 
-    public String join(String ... params) {
+    public String joinGame(String ... params) {
+        if (params.length < 2) {
+            return "Error: missing gameID or Team Color Selection";
+        }
+        var game = new JoinGameRequest(params[1], Integer.parseInt(params[0]));
+        try {
+            server.joinGame(game);
+            return "Success: joined game as " + String.format("%s", params[1]);
+        }
+        catch (Exception e) {
+            return e.getMessage();
+        }
+    }
 
+    public String observeGame(String ... params) {
+        if (params.length < 1) {
+            return "Error: must input gameID number";
+        }
+        if (gameExists(params[0])) {
+            return "Success: observing game " + String.format("%s", params[0]);
+        }
+        return "Error: invalid game ID";
+    }
+
+    private boolean gameExists(String ID) {
+        try {
+            var gameList = server.listGames().games();
+            for (GameData game : gameList) {
+                if (game.gameID() == Integer.parseInt(ID)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (Exception e) {
+            return false;
+        }
     }
 
     private void printPrompt() {

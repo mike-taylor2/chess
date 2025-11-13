@@ -10,7 +10,7 @@ public class UserService {
     private final UserDataAccess userData;
 
     public UserService() {
-        this.userData = new MySqlUserDataAccess();
+        this.userData = new MemoryUserDataAccess();
     }
 
     public RegisterResult register(RegisterRequest req) throws EmptyFieldException {
