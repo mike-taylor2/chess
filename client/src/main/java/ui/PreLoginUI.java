@@ -9,12 +9,10 @@ import java.util.Scanner;
 
 public class PreLoginUI {
     private final ServerFacade server;
-    private final PostLoginUI postUI;
 
 
     public PreLoginUI(ServerFacade server) {
         this.server = server;
-        postUI = new PostLoginUI(server);
     }
 
 
@@ -28,7 +26,7 @@ public class PreLoginUI {
             String line = scanner.nextLine();
             try {
                 result = eval(line);
-                System.out.print(result);
+                System.out.print(result + "\n");
             }
             catch (Throwable e) {
                 var msg = e.toString();
@@ -36,6 +34,7 @@ public class PreLoginUI {
             }
         }
         if (result.contains("Success")) {
+            PostLoginUI postUI = new PostLoginUI(server);
             postUI.run();
         }
     }
@@ -99,6 +98,6 @@ public class PreLoginUI {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + ">>>");
+        System.out.print("\n" + ">>> ");
     }
 }
