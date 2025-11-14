@@ -24,7 +24,7 @@ public class ServerFacadeTests {
     }
 
     @BeforeEach
-    public void clear() {
+    public void repeatClear() {
         try {
             client.clear();
         }
@@ -50,8 +50,10 @@ public class ServerFacadeTests {
     @Test
     public void login() {
         RegisterRequest req = new RegisterRequest("m", "1234", "l");
-        assertDoesNotThrow(() -> client.register(req));
         LoginRequest loginReq = new LoginRequest("m", "1234");
+        assertThrows(Exception.class, () -> client.login(loginReq));
+        assertDoesNotThrow(() -> client.register(req));
+
         assertDoesNotThrow(() -> client.login(loginReq));
         assertDoesNotThrow(() -> client.logout());
     }
@@ -60,6 +62,7 @@ public class ServerFacadeTests {
     public void joinGame() {
 
         var registerReq1 = new RegisterRequest("mike", "1234", "m@ofidsjfo.com");
+        assertThrows(Exception.class, () -> client.joinGame(new JoinGameRequest(null, 1234)));
         assertDoesNotThrow(() -> client.register(registerReq1));
 
         var game = new CreateGameRequest("test");
@@ -84,6 +87,8 @@ public class ServerFacadeTests {
         var game3 = new CreateGameRequest("test3");
 
         var req = new RegisterRequest("Anna", "123", "lsd@.com");
+
+        assertThrows(Exception.class, () -> client.listGames());
 
         assertThrows(Exception.class, () -> client.createGame(game1));
 
@@ -115,6 +120,13 @@ public class ServerFacadeTests {
         assertDoesNotThrow(() -> client.login(new LoginRequest("Anna", "123")));
 
         assertDoesNotThrow(() -> client.createGame(new CreateGameRequest("game")));
+    }
+
+    @Test
+    public void clear() {
+        assertDoesNotThrow(() -> client.clear());
+
+        assertDoesNotThrow(() -> client.clear());
     }
 
 }
