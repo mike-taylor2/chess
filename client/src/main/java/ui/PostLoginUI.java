@@ -39,15 +39,18 @@ public class PostLoginUI {
         if (result.contains("observer")) {
             var board = new DrawBoard(new ChessGame(), "WHITE");
             board.draw();
+            run();
         }
         else if (result.contains("Joined game")) {
             if (result.contains("black")) {
                 var board = new DrawBoard(new ChessGame(), "BLACK");
                 board.draw();
+                run();
             }
             else {
                 var board = new DrawBoard(new ChessGame(), "WHITE");
                 board.draw();
+                run();
             }
 //            GameplayUI gameplayUI = new GameplayUI(server);
 //            gameplayUI.run();
@@ -139,30 +142,38 @@ public class PostLoginUI {
         if (params.length < 2) {
             return "Error: missing game number or Team Color Selection";
         }
-        var game = new JoinGameRequest(params[1].toUpperCase(), numberToID.get(Integer.parseInt(params[0])));
+
         try {
+            var game = new JoinGameRequest(params[1].toUpperCase(), numberToID.get(Integer.parseInt(params[0])));
             server.joinGame(game);
             return "Success: Joined game" + String.format("%d", numberToID.get(Integer.parseInt(params[0])))+ " as " +String.format("%s", params[1]);
         }
         catch (Exception e) {
+            if (!e.getMessage().contains("Error")){
+                return "Error: Invalid input, list games to get valid game numbers";
+            }
             return e.getMessage();
         }
     }
 
     public String observeGame(String ... params) {
         if (params.length < 1) {
-            return "Error: must input gameID number";
+            return "Error: must input game number";
         }
-        if (gameExists(params[0])) {
-            return "Success: Joined game " + String.format("%s", params[0]) + " as observer";
+        try {
+            if (gameExists(numberToID.get(Integer.parseInt(params[0])))) {
+                return "Success: Joined game " + String.format("%s", params[0]) + " as observer";}
         }
-        return "Error: invalid game ID";
+        catch (Exception e) {
+            return "Error: invalid game number";
+        }
+        return "Error: invalid game number";
     }
 
-    private boolean gameExists(String iD) {
+    private boolean gameExists(int iD) {
         try {
             for (GameData game : gameList) {
-                if (game.gameID() == Integer.parseInt(iD)) {
+                if (game.gameID() == iD) {
                     return true;
                 }
             }

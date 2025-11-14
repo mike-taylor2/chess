@@ -7,7 +7,6 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.SET_BG_COLOR_BLACK;
@@ -36,11 +35,16 @@ public class DrawBoard {
 
         out.print(ERASE_SCREEN);
 
-        drawWhiteHeader(out);
+        if (boardColor.equals("WHITE")) { drawWhiteHeader(out);}
+        else {drawBlackHeader(out);}
 
-        drawTicTacToeBoard(out);
+        drawChessBoard(out);
 
-        drawWhiteHeader(out);
+        if (boardColor.equals("WHITE")) { drawWhiteHeader(out);}
+        else {drawBlackHeader(out);}
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
+        out.print('\n');
     }
 
     private void drawWhiteHeader(PrintStream out) {
@@ -49,6 +53,22 @@ public class DrawBoard {
         out.print("   ");
 
         String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" };
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            drawHeader(out, headers[boardCol]);
+        }
+
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(" ");
+
+        out.println();
+    }
+
+    private void drawBlackHeader(PrintStream out) {
+
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print("   ");
+
+        String[] headers = { "h", "g", "f", "e", "d", "c", "b", "a" };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
         }
@@ -73,7 +93,7 @@ public class DrawBoard {
         out.print(player);
     }
 
-    private void drawTicTacToeBoard(PrintStream out) {
+    private void drawChessBoard(PrintStream out) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             out.print(SET_BG_COLOR_LIGHT_GREY);
@@ -147,9 +167,9 @@ public class DrawBoard {
     private void typeChecker(PrintStream out, ChessPiece.PieceType type, String setTextColorBlue) {
         out.print(setTextColorBlue);
         if (type == ChessPiece.PieceType.KING){
-            out.print("K");}
-        else if (type == ChessPiece.PieceType.QUEEN) {
             out.print("Q");}
+        else if (type == ChessPiece.PieceType.QUEEN) {
+            out.print("K");}
         else if (type == ChessPiece.PieceType.ROOK) {
             out.print("R");}
         else if (type == ChessPiece.PieceType.KNIGHT) {
