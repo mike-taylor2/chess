@@ -14,8 +14,6 @@ import java.util.Scanner;
 
 public class PostLoginUI {
     private final ServerFacade server;
-    private int gameToObserve;
-    private int gameToJoin;
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -35,8 +33,7 @@ public class PostLoginUI {
                 System.out.print(result + "\n");
             }
             catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
+                System.out.print(e.toString());
             }
         }
         if (result.contains("observer")) {
@@ -134,7 +131,6 @@ public class PostLoginUI {
         var game = new JoinGameRequest(params[1].toUpperCase(), Integer.parseInt(params[0]));
         try {
             server.joinGame(game);
-            gameToJoin = Integer.parseInt(params[0]);
             return "Success: Joined game" + String.format("%s", params[0]) + " as " + String.format("%s", params[1]);
         }
         catch (Exception e) {
@@ -147,17 +143,16 @@ public class PostLoginUI {
             return "Error: must input gameID number";
         }
         if (gameExists(params[0])) {
-            gameToObserve = Integer.parseInt(params[0]);
             return "Success: Joined game" + String.format("%s", params[0]) + "as observer";
         }
         return "Error: invalid game ID";
     }
 
-    private boolean gameExists(String ID) {
+    private boolean gameExists(String iD) {
         try {
             var gameList = server.listGames().games();
             for (GameData game : gameList) {
-                if (game.gameID() == Integer.parseInt(ID)) {
+                if (game.gameID() == Integer.parseInt(iD)) {
                     return true;
                 }
             }

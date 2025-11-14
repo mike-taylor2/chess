@@ -9,7 +9,7 @@ public class GameService {
     private final GameDataAccess gameData;
 
     public GameService() {
-        this.gameData = new MemoryGameDataAccess();
+        this.gameData = new MySqlGameDataAccess();
     }
 
     public GameDataAccess getGameData(){
