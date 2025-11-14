@@ -3,7 +3,7 @@ package client;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
-import ServerFacade.ServerFacade;
+import facade.ServerFacade;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;

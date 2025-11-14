@@ -2,7 +2,7 @@ package ui;
 
 import exception.ResponseException;
 import model.LoginRequest;
-import ServerFacade.ServerFacade;
+import facade.ServerFacade;
 import model.RegisterRequest;
 import java.util.Arrays;
 import java.util.Scanner;

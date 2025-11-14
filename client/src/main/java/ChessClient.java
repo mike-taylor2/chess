@@ -1,4 +1,4 @@
-import ServerFacade.ServerFacade;
+import facade.ServerFacade;
 import ui.PreLoginUI;
 
 public class ChessClient {
