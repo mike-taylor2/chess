@@ -142,7 +142,7 @@ public class PostLoginUI {
         var game = new JoinGameRequest(params[1].toUpperCase(), numberToID.get(Integer.parseInt(params[0])));
         try {
             server.joinGame(game);
-            return "Success: Joined game" + String.format("%d", numberToID.get(Integer.parseInt(params[0]))) + " as " + String.format("%s", params[1]);
+            return "Success: Joined game" + String.format("%d", numberToID.get(Integer.parseInt(params[0])))+ " as " +String.format("%s", params[1]);
         }
         catch (Exception e) {
             return e.getMessage();
