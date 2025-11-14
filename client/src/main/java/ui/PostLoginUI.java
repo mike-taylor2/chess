@@ -1,16 +1,21 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.CreateGameRequest;
 import model.GameData;
 import model.JoinGameRequest;
 import server.ServerFacade;
 
+
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class PostLoginUI {
     private final ServerFacade server;
+    private int gameToObserve;
+    private int gameToJoin;
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -27,16 +32,26 @@ public class PostLoginUI {
             String line = scanner.nextLine();
             try {
                 result = eval(line);
-                System.out.print(result);
+                System.out.print(result + "\n");
             }
             catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
             }
         }
-        if (result.contains("game")) {
-            if (result.contains("BLACK")) {}
-            else {}
+        if (result.contains("observer")) {
+            var board = new DrawBoard(new ChessGame(), "WHITE");
+            board.draw();
+        }
+        else if (result.contains("Joined")) {
+            if (result.contains("black")) {
+                var board = new DrawBoard(new ChessGame(), "BLACK");
+                board.draw();
+            }
+            else {
+                var board = new DrawBoard(new ChessGame(), "WHITE");
+                board.draw();
+            }
 //            GameplayUI gameplayUI = new GameplayUI(server);
 //            gameplayUI.run();
         }
@@ -116,10 +131,11 @@ public class PostLoginUI {
         if (params.length < 2) {
             return "Error: missing gameID or Team Color Selection";
         }
-        var game = new JoinGameRequest(params[1], Integer.parseInt(params[0]));
+        var game = new JoinGameRequest(params[1].toUpperCase(), Integer.parseInt(params[0]));
         try {
             server.joinGame(game);
-            return "Success: joined game as " + String.format("%s", params[1]);
+            gameToJoin = Integer.parseInt(params[0]);
+            return "Success: Joined game" + String.format("%s", params[0]) + " as " + String.format("%s", params[1]);
         }
         catch (Exception e) {
             return e.getMessage();
@@ -131,7 +147,8 @@ public class PostLoginUI {
             return "Error: must input gameID number";
         }
         if (gameExists(params[0])) {
-            return "Success: observing game " + String.format("%s", params[0]);
+            gameToObserve = Integer.parseInt(params[0]);
+            return "Success: Joined game" + String.format("%s", params[0]) + "as observer";
         }
         return "Error: invalid game ID";
     }
