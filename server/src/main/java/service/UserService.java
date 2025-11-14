@@ -23,7 +23,8 @@ public class UserService {
 
     public LoginResult login(LoginRequest req) throws EmptyFieldException {
         if (req.username() == null || req.password() == null){
-            throw new EmptyFieldException("Error: One or more fields are empty");}
+            throw new EmptyFieldException("Error: One or more fields are empty");
+        }
         return userData.loginUser(req.username(), req.password());
     }
 
