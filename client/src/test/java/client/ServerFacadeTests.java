@@ -40,7 +40,13 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void register() {
+    public void pRegister() {
+        RegisterRequest req = new RegisterRequest("mike", "1233", "l");
+        assertDoesNotThrow(() -> client.register(req));
+    }
+
+    @Test
+    public void nRegister() {
         RegisterRequest req = new RegisterRequest("mike", "1233", "l");
         assertDoesNotThrow(() -> client.register(req));
 
@@ -48,7 +54,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void login() {
+    public void pLogin() {
         RegisterRequest req = new RegisterRequest("m", "1234", "l");
         LoginRequest loginReq = new LoginRequest("m", "1234");
         assertThrows(Exception.class, () -> client.login(loginReq));
@@ -59,10 +65,16 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void joinGame() {
+    public void nLogin() {
+        LoginRequest loginReq = new LoginRequest("m", "1234");
+        assertThrows(Exception.class, () -> client.login(loginReq));
+    }
+
+    @Test
+    public void pJoinGame() {
 
         var registerReq1 = new RegisterRequest("mike", "1234", "m@ofidsjfo.com");
-        assertThrows(Exception.class, () -> client.joinGame(new JoinGameRequest(null, 1234)));
+
         assertDoesNotThrow(() -> client.register(registerReq1));
 
         var game = new CreateGameRequest("test");
@@ -81,14 +93,18 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGames() {
+    public void nJoinGame() {
+        var registerReq1 = new RegisterRequest("mike", "1234", "m@ofidsjfo.com");
+        assertThrows(Exception.class, () -> client.joinGame(new JoinGameRequest(null, 1234)));
+    }
+
+    @Test
+    public void pListGames() {
         var game1 = new CreateGameRequest("test1");
         var game2 = new CreateGameRequest("test2");
         var game3 = new CreateGameRequest("test3");
 
         var req = new RegisterRequest("Anna", "123", "lsd@.com");
-
-        assertThrows(Exception.class, () -> client.listGames());
 
         assertThrows(Exception.class, () -> client.createGame(game1));
 
@@ -103,8 +119,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logout() {
-        assertThrows(Exception.class, () -> client.logout());
+    public void nListGames() {
+        var game1 = new CreateGameRequest("test1");
+        assertThrows(Exception.class, () -> client.listGames());
+        assertThrows(Exception.class, () -> client.createGame(game1));
+    }
+
+    @Test
+    public void pLogout() {
 
         RegisterRequest req = new RegisterRequest("m", "1234", "l");
         assertDoesNotThrow(() -> client.register(req));
@@ -113,8 +135,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGame() {
-        assertThrows(Exception.class, () -> client.createGame(new CreateGameRequest("game")));
+    public void nLogout() {
+        assertThrows(Exception.class, () -> client.logout());
+    }
+
+    @Test
+    public void pCreateGame() {
         var req = new RegisterRequest("Anna", "123", "lsd@.com");
         assertDoesNotThrow(() -> client.register(req));
         assertDoesNotThrow(() -> client.login(new LoginRequest("Anna", "123")));
@@ -123,9 +149,19 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void clear() {
+    public void nCreateGame() {
+        assertThrows(Exception.class, () -> client.createGame(new CreateGameRequest("game")));
+    }
+
+    @Test
+    public void pClear() {
         assertDoesNotThrow(() -> client.clear());
 
+        assertDoesNotThrow(() -> client.clear());
+    }
+
+    @Test
+    public void nClear() {
         assertDoesNotThrow(() -> client.clear());
     }
 
