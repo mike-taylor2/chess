@@ -36,7 +36,7 @@ public class MemoryGameDataAccess implements GameDataAccess{
             throw new EmptyFieldException("Error: PlayerColor field is empty");
         }
         if (!(req.playerColor().equals("WHITE") || req.playerColor().equals("BLACK"))) {
-            throw new EmptyFieldException("Error: PlayerColor field is empty");
+            throw new EmptyFieldException("Error: PlayerColor field is incorrect (must be WHITE or BLACK)");
         }
         if (req.playerColor().equals("WHITE") && game.whiteUsername() == null) {
             var joinedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());

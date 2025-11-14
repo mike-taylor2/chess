@@ -8,12 +8,12 @@ import model.JoinGameRequest;
 import server.ServerFacade;
 
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 public class PostLoginUI {
     private final ServerFacade server;
+    private ArrayList<GameData> gameList = new ArrayList<>();
+    private HashMap<Integer, Integer> numberToID = new HashMap<>();
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -25,7 +25,7 @@ public class PostLoginUI {
         String result = "";
         Scanner scanner = new Scanner(System.in);
 
-        while (!result.contains("Joined") && !result.contains("out")) {
+        while (!result.contains("Joined game") && !result.contains("Logged out")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
@@ -40,7 +40,7 @@ public class PostLoginUI {
             var board = new DrawBoard(new ChessGame(), "WHITE");
             board.draw();
         }
-        else if (result.contains("Joined")) {
+        else if (result.contains("Joined game")) {
             if (result.contains("black")) {
                 var board = new DrawBoard(new ChessGame(), "BLACK");
                 board.draw();
@@ -97,7 +97,9 @@ public class PostLoginUI {
         var game = new CreateGameRequest(params[0]);
         try {
             var newGame = server.createGame(game);
-            return "Success: Created new game " + String.format("(%d)", newGame.gameID());
+            gameList.add(new GameData(newGame.gameID(), null, null, params[0], new ChessGame()));
+            numberToID.put(gameList.size(), newGame.gameID());
+            return "Success: Created new game " + String.format("(%d)", gameList.size());
         }
         catch (Exception e) {
             return e.getMessage();
@@ -106,12 +108,21 @@ public class PostLoginUI {
 
     public String listGames() throws ResponseException {
         try {
-            var gameList = server.listGames().games();
-            return gameList.toString();
+            gameList = server.listGames().games();
         }
         catch (Exception e) {
             return e.getMessage();
         }
+        StringBuilder sb = new StringBuilder();
+        numberToID.clear();
+
+        for (int i = 0; i < gameList.size(); i++) {
+            String number = String.valueOf(i+1);
+            String game = "(" + number + ") " + gameList.get(i).toString() + "\n";
+            sb.append(game);
+            numberToID.put(i+1, gameList.get(i).gameID());
+        }
+        return sb.toString();
     }
 
     public String logout() throws ResponseException {
@@ -126,12 +137,12 @@ public class PostLoginUI {
 
     public String joinGame(String ... params) {
         if (params.length < 2) {
-            return "Error: missing gameID or Team Color Selection";
+            return "Error: missing game number or Team Color Selection";
         }
-        var game = new JoinGameRequest(params[1].toUpperCase(), Integer.parseInt(params[0]));
+        var game = new JoinGameRequest(params[1].toUpperCase(), numberToID.get(Integer.parseInt(params[0])));
         try {
             server.joinGame(game);
-            return "Success: Joined game" + String.format("%s", params[0]) + " as " + String.format("%s", params[1]);
+            return "Success: Joined game" + String.format("%d", numberToID.get(Integer.parseInt(params[0]))) + " as " + String.format("%s", params[1]);
         }
         catch (Exception e) {
             return e.getMessage();
@@ -143,14 +154,13 @@ public class PostLoginUI {
             return "Error: must input gameID number";
         }
         if (gameExists(params[0])) {
-            return "Success: Joined game" + String.format("%s", params[0]) + "as observer";
+            return "Success: Joined game " + String.format("%s", params[0]) + " as observer";
         }
         return "Error: invalid game ID";
     }
 
     private boolean gameExists(String iD) {
         try {
-            var gameList = server.listGames().games();
             for (GameData game : gameList) {
                 if (game.gameID() == Integer.parseInt(iD)) {
                     return true;
