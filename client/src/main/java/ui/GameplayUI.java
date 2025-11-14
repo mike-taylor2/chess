@@ -1,6 +1,6 @@
 package ui;
 
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 
 public class GameplayUI {
     private final ServerFacade server;

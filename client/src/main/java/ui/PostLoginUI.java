@@ -5,7 +5,7 @@ import exception.ResponseException;
 import model.CreateGameRequest;
 import model.GameData;
 import model.JoinGameRequest;
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 
 
 import java.util.*;
