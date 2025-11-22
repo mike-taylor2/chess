@@ -123,7 +123,7 @@ public class DrawBoard {
                     out.print(SET_BG_COLOR_WHITE);
                     out.print(" ");
                     // print chess piece?
-                    printChessPiece(out, boardRow, 8 - boardCol);
+                    printChessPiece(out, boardRow, 1 + boardCol);
                     out.print(SET_BG_COLOR_WHITE);
                     out.print(" ");
                     leftMostSquare = "BLACK";
@@ -132,7 +132,7 @@ public class DrawBoard {
                     out.print(SET_BG_COLOR_BLACK);
                     out.print(" ");
                     // print chess piece?
-                    printChessPiece(out, boardRow, 8 - boardCol);
+                    printChessPiece(out, boardRow, 1 + boardCol);
                     out.print(SET_BG_COLOR_BLACK);
                     out.print(" ");
                     leftMostSquare = "WHITE";
@@ -167,9 +167,9 @@ public class DrawBoard {
     private void typeChecker(PrintStream out, ChessPiece.PieceType type, String setTextColorBlue) {
         out.print(setTextColorBlue);
         if (type == ChessPiece.PieceType.KING){
-            out.print("Q");}
-        else if (type == ChessPiece.PieceType.QUEEN) {
             out.print("K");}
+        else if (type == ChessPiece.PieceType.QUEEN) {
+            out.print("Q");}
         else if (type == ChessPiece.PieceType.ROOK) {
             out.print("R");}
         else if (type == ChessPiece.PieceType.KNIGHT) {
