@@ -14,9 +14,11 @@ public class PostLoginUI {
     private final ServerFacade server;
     private ArrayList<GameData> gameList = new ArrayList<>();
     private HashMap<Integer, Integer> numberToID = new HashMap<>();
+    private String username;
 
-    public PostLoginUI(ServerFacade server) {
+    public PostLoginUI(ServerFacade server, String username) {
         this.server = server;
+        this.username = username;
     }
 
 

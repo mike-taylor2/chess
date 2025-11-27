@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class PreLoginUI {
     private final ServerFacade server;
+    private String username;
 
 
     public PreLoginUI(ServerFacade server) {
@@ -34,7 +35,7 @@ public class PreLoginUI {
             }
         }
         if (result.contains("Success")) {
-            PostLoginUI postUI = new PostLoginUI(server);
+            PostLoginUI postUI = new PostLoginUI(server, username);
             postUI.run();
         }
     }
@@ -80,6 +81,7 @@ public class PreLoginUI {
         catch (Exception e){
             return e.getMessage();
         }
+        username = params[0];
         return "Success: Registered and Logged in";
     }
 
