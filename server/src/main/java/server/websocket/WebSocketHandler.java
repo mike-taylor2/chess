@@ -7,8 +7,6 @@ import websocket.commands.*;
 
 import java.io.IOException;
 
-import static websocket.commands.UserGameCommand.CommandType.RESIGN;
-
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
 
