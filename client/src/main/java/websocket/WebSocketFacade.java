@@ -36,9 +36,11 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void connect(String username, int gameID) {
+    public void joinGame(String username, int gameID) {
         // For each method, use the information from the parameters to create specific UserGameCommand
         // authToken can be obtained from ServerFacade
+
+        // joinGame specifically will only send the message that the player has joined to all other participants
     }
 
     public void makeMove(String username, String gameID, String move) {

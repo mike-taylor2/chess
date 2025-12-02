@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import exception.ResponseException;
+import model.ClientGameplayData;
 import model.CreateGameRequest;
 import model.GameData;
 import model.JoinGameRequest;
@@ -15,6 +16,7 @@ public class PostLoginUI {
     private ArrayList<GameData> gameList = new ArrayList<>();
     private HashMap<Integer, Integer> numberToID = new HashMap<>();
     private String username;
+    private int gameID;
 
     public PostLoginUI(ServerFacade server, String username) {
         this.server = server;
@@ -39,23 +41,21 @@ public class PostLoginUI {
             }
         }
         if (result.contains("observer")) {
-            var board = new DrawBoard(new ChessGame(), "WHITE");
-            board.draw();
-            run();
+            var clientData = new ClientGameplayData(username, ClientGameplayData.Role.OBSERVER, gameID);
+            var gameplayUI = new GameplayUI(server, clientData);
+            gameplayUI.run();
         }
         else if (result.contains("Joined game")) {
             if (result.contains("black")) {
-                var board = new DrawBoard(new ChessGame(), "BLACK");
-                board.draw();
-                run();
+                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.BLACK, gameID);
+                var gameplayUI = new GameplayUI(server, clientData);
+                gameplayUI.run();
             }
             else {
-                var board = new DrawBoard(new ChessGame(), "WHITE");
-                board.draw();
-                run();
+                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.WHITE, gameID);
+                var gameplayUI = new GameplayUI(server, clientData);
+                gameplayUI.run();
             }
-//            GameplayUI gameplayUI = new GameplayUI(server);
-//            gameplayUI.run();
         }
         else {
             PreLoginUI preUI = new PreLoginUI(server);
@@ -146,7 +146,8 @@ public class PostLoginUI {
         }
 
         try {
-            var game = new JoinGameRequest(params[1].toUpperCase(), numberToID.get(Integer.parseInt(params[0])));
+            gameID = numberToID.get(Integer.parseInt(params[0]));
+            var game = new JoinGameRequest(params[1].toUpperCase(), gameID);
             server.joinGame(game);
             return "Success: Joined game" + String.format("%d", numberToID.get(Integer.parseInt(params[0])))+ " as " +String.format("%s", params[1]);
         }
@@ -164,6 +165,7 @@ public class PostLoginUI {
         }
         try {
             if (gameExists(numberToID.get(Integer.parseInt(params[0])))) {
+                gameID = numberToID.get(Integer.parseInt(params[0]));
                 return "Success: Joined game " + String.format("%s", params[0]) + " as observer";}
         }
         catch (Exception e) {

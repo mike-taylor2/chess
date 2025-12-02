@@ -23,7 +23,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (action.getCommandType()) {
                 case CONNECT -> {
                     ConnectUserGameCommand connectCommand = new Gson().fromJson(ctx.message(), ConnectUserGameCommand.class);
-                    connect(connectCommand, ctx.session);}
+                    joinGame(connectCommand, ctx.session);}
                 case MAKE_MOVE -> {
                     MakeMoveUserGameCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveUserGameCommand.class);
                     makeMove(makeMoveCommand, ctx.session);}
