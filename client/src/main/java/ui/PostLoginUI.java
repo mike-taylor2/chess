@@ -153,7 +153,7 @@ public class PostLoginUI {
         }
         catch (Exception e) {
             if (!e.getMessage().contains("Error")){
-                return "Error: Invalid input, list games to get valid game numbers";
+                return "Error: Invalid input, list games to get valid game numbers and see open spots";
             }
             return e.getMessage();
         }
