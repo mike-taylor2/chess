@@ -1,5 +1,8 @@
 package dataaccess;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import model.CreateGameRequest;
 import model.CreateGameResult;
 import model.GameData;
@@ -18,4 +21,6 @@ public interface GameDataAccess {
     void joinGame(JoinGameRequest req, String username);
 
     boolean verifyGameID(int gameID);
+
+    ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException;
 }

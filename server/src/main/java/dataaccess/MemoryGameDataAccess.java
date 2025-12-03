@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import model.CreateGameResult;
 import model.GameData;
 import model.JoinGameRequest;
@@ -65,5 +67,9 @@ public class MemoryGameDataAccess implements GameDataAccess{
     @Override
     public boolean verifyGameID(int gameID) {
         return false;
+    }
+
+    public ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException {
+        return new ChessGame();
     }
 }

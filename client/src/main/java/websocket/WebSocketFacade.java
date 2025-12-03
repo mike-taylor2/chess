@@ -84,7 +84,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (Exception e) {
-            System.out.print("Error: Unable to connect to database");
+            System.out.print("Error: Unable to connect to server");
         }
     }
 

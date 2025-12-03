@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.CreateGameResult;
 import model.GameData;
@@ -173,5 +175,14 @@ public class MySqlGameDataAccess implements GameDataAccess{
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException {
+        GameData oldGame = findGame(gameID);
+        var game = oldGame.game();
+        game.makeMove(move);
+        GameData newGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), oldGame.blackUsername(), oldGame.gameName(), game);
+        editGame(oldGame, newGame);
+        return findGame(gameID).game();
     }
 }

@@ -1,5 +1,8 @@
 package service;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.GameDataAccess;
 import dataaccess.MemoryGameDataAccess;
 import dataaccess.MySqlGameDataAccess;
@@ -34,5 +37,9 @@ public class GameService {
 
     public boolean verifyGameID(int gameID) {
         return gameData.verifyGameID(gameID);
+    }
+
+    public ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException {
+        return gameData.makeMove(gameID, move);
     }
 }

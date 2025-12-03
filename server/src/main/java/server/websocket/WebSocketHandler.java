@@ -8,6 +8,8 @@ import service.GameService;
 import service.UserService;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void joinGame(ConnectUserGameCommand command, Session session) {
         String username;
-        verifyInputData(session, command.getAuthToken(), command.getGameID();
+        verifyInputData(session, command.getAuthToken(), command.getGameID());
         try {
             username = userService.getUsername(command.getAuthToken());
             connections.join(session, game, command, username);
@@ -62,6 +64,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(MakeMoveUserGameCommand command, Session session) {
         verifyInputData(session, command.getAuthToken(), command.getGameID());
+        var username = userService.getUsername(command.getAuthToken());
+        try {
+            var game = gameService.makeMove(command.getGameID(), command.getMove());
+            var loadGameMessage = new LoadGameMessage(game);
+            var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s", username, "a3", "a4"));
+
+        } catch (Exception e) {
+            var errorMessage = new ErrorMessage("Error: Invalid move");
+            connections.directedMessage(session, errorMessage);
+        }
 
     }
 
