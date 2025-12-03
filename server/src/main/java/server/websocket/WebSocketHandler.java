@@ -50,22 +50,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void joinGame(ConnectUserGameCommand command, Session session) {
         String username;
-        try {
-            // Verify authToken
-            userService.verifyAuthData(command.getAuthToken());
-        }catch (Exception e) {
-            var errorMessage = new ErrorMessage("Error: not authorized");
-            connections.directedMessage(session, errorMessage);
-            return;
-        }
-        try {
-            // Verify gameID
-            gameService.verifyGameID(command.getGameID());
-        } catch (Exception e) {
-            var errorMessage2 = new ErrorMessage("Error: invalid gameID");
-            connections.directedMessage(session, errorMessage2);
-            return;
-        }
+        verifyInputData(session, command.getAuthToken(), command.getGameID();
         try {
             username = userService.getUsername(command.getAuthToken());
             connections.join(session, game, command, username);
@@ -76,7 +61,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(MakeMoveUserGameCommand command, Session session) {
+        verifyInputData(session, command.getAuthToken(), command.getGameID());
 
+    }
+
+    private void verifyInputData(Session session, String authToken, Integer gameID) throws IOException {
+        try {
+            userService.verifyAuthData(authToken);
+        }catch (Exception e) {
+            var errorMessage = new ErrorMessage("Error: not authorized");
+            connections.directedMessage(session, errorMessage);
+            return;
+        }
+        if (!gameService.verifyGameID(gameID)) {
+            var errorMessage = new ErrorMessage("Error: gameID does not exist");
+            connections.directedMessage(session, errorMessage);
+        }
     }
 
     @Override
