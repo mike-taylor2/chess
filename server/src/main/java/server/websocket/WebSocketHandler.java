@@ -1,7 +1,11 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
+import org.eclipse.jetty.websocket.api.Session;
+import service.GameService;
+import service.UserService;
 import websocket.commands.*;
 
 
@@ -9,6 +13,9 @@ import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    private final UserService userService = new UserService();
+    private final GameService gameService = new GameService();
+    private ChessGame game = new ChessGame();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -37,6 +44,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void joinGame(ConnectUserGameCommand command, Session session) {
+        try {
+            connections.join(session, game, command, userService.getUsername(command.getAuthToken()));
+        }
+        catch (Exception e) {
+            System.out.println("Error in joinGame");
         }
     }
 

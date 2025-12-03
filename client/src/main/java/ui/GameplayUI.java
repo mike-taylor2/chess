@@ -1,42 +1,62 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import exception.ResponseException;
 import facade.ServerFacade;
 import model.ClientGameplayData;
+import model.DataCoordinates;
 import model.JoinGameRequest;
 import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+
+import static chess.ChessGame.TeamColor.WHITE;
+import static ui.EscapeSequences.*;
 
 public class GameplayUI implements ServerMessageHandler {
     private final ServerFacade server;
     private final String username;
     private final ClientGameplayData.Role role;
     private final int gameID;
+    private final String authToken;
     private ChessGame game;
     private final WebSocketFacade ws;
+    private Scanner scanner;
 
     public GameplayUI(ServerFacade server, ClientGameplayData data) {
         this.server = server;
         this.username = data.username();
         this.role = data.role();
         this.gameID = data.gameID();
+        this.authToken = server.getAuthToken();
         this.game = new ChessGame();
-        this.ws = new WebSocketFacade(server.getServerUrl(), this);
+        this.ws = new WebSocketFacade(server.getServerUrl(), this, authToken);
+        this.scanner = new Scanner(System.in);
 
         redraw();
-        ws.joinGame(username, gameID);
+
+        var clientData = new ClientGameplayData(username, role, gameID);
+        try {
+            ws.joinGame(clientData);
+        }
+        catch (Exception e) {
+            System.out.println("joinGame failed");
+        }
     }
 
 
     public void run() {
         System.out.print(help());
         String result = "";
-        Scanner scanner = new Scanner(System.in);
 
         while (!result.contains("Leaving")) {
             prompt();
@@ -73,7 +93,7 @@ public class GameplayUI implements ServerMessageHandler {
         }
     }
     // Local
-    public void redraw() {
+    public String redraw() {
         DrawBoard board;
         if (role == ClientGameplayData.Role.BLACK) {
             board = new DrawBoard(game, "BLACK");
@@ -82,6 +102,7 @@ public class GameplayUI implements ServerMessageHandler {
             board = new DrawBoard(game, "WHITE");
         }
         board.draw();
+        return "";
     }
     // WebsocketFacade
     public String leave() {
@@ -89,7 +110,47 @@ public class GameplayUI implements ServerMessageHandler {
     }
     // WebsocketFacade
     public String makeMove(String ... params) {
+        if (params.length < 2 || params[0].length() != 2 || params[1].length() != 2) {
+            return "Error: input move in this format: a3 b4";
+        }
 
+        char r0 = params[0].charAt(1);
+        char c0 = params[0].charAt(0);
+        char r1 = params[1].charAt(1);
+        char c1 = params[1].charAt(0);
+
+        DataCoordinates coordinates;
+        try {
+            coordinates = cleanCoordinates(r0, c0, r1, c1);
+        } catch (Exception e) {
+            return "Error: invalid coordinates entered. See chessboard for possible coordinates";
+        }
+
+
+        var startPosition = new ChessPosition(coordinates.r0(), coordinates.c0());
+        var endPosition = new ChessPosition(coordinates.r1(), coordinates.c1());
+        ChessPiece.PieceType piece = null;
+        String letter;
+
+        if (possiblePawnPromotion(startPosition, endPosition)) {
+            System.out.print(
+                    """
+                    This move involves pawn promotion. Here are the following options for promotion:
+                    -q (queen)
+                    -r (rook)
+                    -b (bishop)
+                    -k (knight)
+                    """);
+            prompt();
+            letter = scanner.nextLine().toLowerCase();
+            try {
+                piece = cleanPieceInput(letter);
+            } catch (Exception e) {
+                return "Error: bad piece type";
+            }
+        }
+
+        var move = new ChessMove(new ChessPosition(r0, c0), new ChessPosition(r1, c1), piece);
     }
     // WebsocketFacade
     public String resign() {
@@ -101,7 +162,16 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     public void notify(ServerMessage serverMessage) {
-
+        // This is where the LOAD_GAME server message is received and client redraws board
+        if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            game = ws.getCurrentGame();
+            redraw();
+        }
+        else {
+            var notification = (NotificationMessage) serverMessage;
+            System.out.println(SET_TEXT_COLOR_RED + notification.getMessage());
+        }
+        prompt();
     }
 
     public String help() {
@@ -115,7 +185,67 @@ public class GameplayUI implements ServerMessageHandler {
                 """;
     }
 
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
+
     private void prompt() {
         System.out.print("\n" + ">>> ");
+    }
+
+    private boolean possiblePawnPromotion(ChessPosition start, ChessPosition end) {
+        var board = game.getBoard();
+        if (board.getPiece(start).getPieceType() != ChessPiece.PieceType.PAWN) {
+            return false;
+        }
+        if (board.getPiece(start).getTeamColor() == WHITE) {
+            return end.getRow() == 8;
+        }
+        else {
+            return end.getRow() == 1;
+        }
+    }
+
+    private DataCoordinates cleanCoordinates(char r0, char c0, char r1, char c1) throws ResponseException {
+        Map<String, Integer> map0 = Map.of(
+                "a", 1,
+                "b", 2,
+                "c", 3,
+                "d", 4,
+                "e", 5,
+                "f", 6,
+                "g", 7,
+                "h", 8
+        );
+        int r0_, c0_, r1_, c1_;
+
+        String _r0 = String.valueOf(r0).toLowerCase();
+        String _c0 = String.valueOf(c0);
+        String _r1 = String.valueOf(r1).toLowerCase();
+        String _c1 = String.valueOf(c1);
+
+        try {
+            r0_ = map0.get(_r0);
+            c0_ = Integer.parseInt(_c0);
+            r1_ = map0.get(_r1);
+            c1_ = Integer.parseInt(_c1);
+
+            if (c0_ < 1 || c0_ > 8 || c1_ < 1 || c1_ > 8) {
+                throw new ResponseException(ResponseException.Code.ServerError, "Bad input");
+            }
+        } catch (Exception e) {
+            throw new ResponseException(ResponseException.Code.ServerError, "Bad input");
+        }
+        return new DataCoordinates(r0_, c0_, r1_, c1_);
+    }
+
+    private ChessPiece.PieceType cleanPieceInput(String letter) {
+        Map<String, ChessPiece.PieceType> map = Map.of(
+                "q", ChessPiece.PieceType.QUEEN,
+                "r", ChessPiece.PieceType.ROOK,
+                "b", ChessPiece.PieceType.BISHOP,
+                "k", ChessPiece.PieceType.KNIGHT
+        );
+        return map.get(letter);
     }
 }

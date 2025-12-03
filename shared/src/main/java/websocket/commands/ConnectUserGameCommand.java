@@ -14,8 +14,6 @@ public class ConnectUserGameCommand extends UserGameCommand {
         this.role = role;
     }
 
-
-
     public enum Role {
         WHITE,
         BLACK,

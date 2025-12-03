@@ -115,4 +115,8 @@ public class ServerFacade {
     public String getServerUrl() {
         return serverUrl;
     }
+
+    public String getAuthToken() {
+        return authToken;
+    }
 }
