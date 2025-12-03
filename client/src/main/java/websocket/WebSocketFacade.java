@@ -7,6 +7,7 @@ import exception.ResponseException;
 import jakarta.websocket.*;
 import model.ClientGameplayData;
 import websocket.commands.ConnectUserGameCommand;
+import websocket.commands.MakeMoveUserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -79,11 +80,12 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void makeMove(ClientGameplayData data, ChessMove move) {
-
-    }
-
-    public void makeMove(String username, String gameID, String move) {
-
+        var command = new MakeMoveUserGameCommand(authToken, data.gameID(), move);
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) {
+            System.out.print("Error: Unable to connect to database");
+        }
     }
 
     public void leave(String username, int gameID) {

@@ -62,4 +62,8 @@ public class MemoryGameDataAccess implements GameDataAccess{
         throw new EmptyFieldException("Error: Game does not exist");
     }
 
+    @Override
+    public boolean verifyGameID(int gameID) {
+        return false;
+    }
 }

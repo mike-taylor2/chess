@@ -139,7 +139,7 @@ public class MySqlGameDataAccess implements GameDataAccess{
         var statement1 = "DELETE FROM GameData WHERE gameID=?";
         executeUpdate(statement1, oldGame.gameID());
         var statement2 = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
-        var json = new Gson().toJson(oldGame.game());
+        var json = new Gson().toJson(newGame.game());
         executeUpdate(statement2, newGame.gameID(), newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json);
     }
 
@@ -164,5 +164,14 @@ public class MySqlGameDataAccess implements GameDataAccess{
             throw new DataAccessException("Error: game not found", e);
         }
         throw new EmptyFieldException("Error: bad game ID");
+    }
+
+    public boolean verifyGameID(int gameID) {
+        try {
+            findGame(gameID);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -31,4 +31,8 @@ public class GameService {
         gameData.joinGame(req, username);
         return "{}";
     }
+
+    public boolean verifyGameID(int gameID) {
+        return gameData.verifyGameID(gameID);
+    }
 }

@@ -304,5 +304,9 @@ public class ChessGame {
     public int hashCode() {
         return Objects.hash(myBoard, whiteTurn);
     }
+
+    public boolean getWhiteTurn() {
+        return whiteTurn;
+    }
 }
 

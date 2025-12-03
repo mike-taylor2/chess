@@ -40,26 +40,31 @@ public class PostLoginUI {
                 System.out.print(e.toString());
             }
         }
-        if (result.contains("observer")) {
-            var clientData = new ClientGameplayData(username, ClientGameplayData.Role.OBSERVER, gameID);
-            var gameplayUI = new GameplayUI(server, clientData);
-            gameplayUI.run();
-        }
-        else if (result.contains("Joined game")) {
-            if (result.contains("black")) {
-                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.BLACK, gameID);
+        try {
+            if (result.contains("observer")) {
+                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.OBSERVER, gameID);
                 var gameplayUI = new GameplayUI(server, clientData);
                 gameplayUI.run();
+            }
+            else if (result.contains("Joined game")) {
+                if (result.contains("black")) {
+                    var clientData = new ClientGameplayData(username, ClientGameplayData.Role.BLACK, gameID);
+                    var gameplayUI = new GameplayUI(server, clientData);
+                    gameplayUI.run();
+                }
+                else {
+                    var clientData = new ClientGameplayData(username, ClientGameplayData.Role.WHITE, gameID);
+                    var gameplayUI = new GameplayUI(server, clientData);
+                    gameplayUI.run();
+                }
             }
             else {
-                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.WHITE, gameID);
-                var gameplayUI = new GameplayUI(server, clientData);
-                gameplayUI.run();
+                PreLoginUI preUI = new PreLoginUI(server);
+                preUI.run();
             }
-        }
-        else {
-            PreLoginUI preUI = new PreLoginUI(server);
-            preUI.run();
+        } catch (Exception e) {
+            System.out.print("Error: Failed to connect");
+            this.run();
         }
     }
 

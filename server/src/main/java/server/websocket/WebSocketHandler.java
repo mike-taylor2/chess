@@ -7,6 +7,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
 import websocket.commands.*;
+import websocket.messages.ErrorMessage;
 
 
 import java.io.IOException;
@@ -34,26 +35,48 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case MAKE_MOVE -> {
                     MakeMoveUserGameCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveUserGameCommand.class);
                     makeMove(makeMoveCommand, ctx.session);}
-                case LEAVE -> {
-                    LeaveUserGameCommand leaveCommand = new Gson().fromJson(ctx.message(), LeaveUserGameCommand.class);
-                    leave(leaveCommand, ctx.session);}
-                case RESIGN -> {
-                    ResignUserGameCommand resignCommand = new Gson().fromJson(ctx.message(), ResignUserGameCommand.class);
-                    resign(resignCommand, ctx.session);}
+//                case LEAVE -> {
+//                    LeaveUserGameCommand leaveCommand = new Gson().fromJson(ctx.message(), LeaveUserGameCommand.class);
+//                    leave(leaveCommand, ctx.session);}
+//                case RESIGN -> {
+//                    ResignUserGameCommand resignCommand = new Gson().fromJson(ctx.message(), ResignUserGameCommand.class);
+//                    resign(resignCommand, ctx.session);}
             }
         }
-        catch (IOException ex) {
+        catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     private void joinGame(ConnectUserGameCommand command, Session session) {
+        String username;
         try {
-            connections.join(session, game, command, userService.getUsername(command.getAuthToken()));
+            // Verify authToken
+            userService.verifyAuthData(command.getAuthToken());
+        }catch (Exception e) {
+            var errorMessage = new ErrorMessage("Error: not authorized");
+            connections.directedMessage(session, errorMessage);
+            return;
+        }
+        try {
+            // Verify gameID
+            gameService.verifyGameID(command.getGameID());
+        } catch (Exception e) {
+            var errorMessage2 = new ErrorMessage("Error: invalid gameID");
+            connections.directedMessage(session, errorMessage2);
+            return;
+        }
+        try {
+            username = userService.getUsername(command.getAuthToken());
+            connections.join(session, game, command, username);
         }
         catch (Exception e) {
             System.out.println("Error in joinGame");
         }
+    }
+
+    private void makeMove(MakeMoveUserGameCommand command, Session session) {
+
     }
 
     @Override

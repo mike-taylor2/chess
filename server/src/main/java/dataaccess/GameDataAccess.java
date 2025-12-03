@@ -16,4 +16,6 @@ public interface GameDataAccess {
     CreateGameResult createGame(String gameName);
 
     void joinGame(JoinGameRequest req, String username);
+
+    boolean verifyGameID(int gameID);
 }

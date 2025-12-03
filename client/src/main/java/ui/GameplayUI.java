@@ -30,9 +30,9 @@ public class GameplayUI implements ServerMessageHandler {
     private final String authToken;
     private ChessGame game;
     private final WebSocketFacade ws;
-    private Scanner scanner;
+    private final Scanner scanner;
 
-    public GameplayUI(ServerFacade server, ClientGameplayData data) {
+    public GameplayUI(ServerFacade server, ClientGameplayData data) throws ResponseException {
         this.server = server;
         this.username = data.username();
         this.role = data.role();
@@ -49,7 +49,7 @@ public class GameplayUI implements ServerMessageHandler {
             ws.joinGame(clientData);
         }
         catch (Exception e) {
-            System.out.println("joinGame failed");
+            throw new ResponseException(ResponseException.Code.ServerError, "Error: Failed to connect");
         }
     }
 
@@ -110,9 +110,14 @@ public class GameplayUI implements ServerMessageHandler {
     }
     // WebsocketFacade
     public String makeMove(String ... params) {
+        if (game.getWhiteTurn() && role == ClientGameplayData.Role.BLACK) {
+            return "Error: It is not your turn";}
+        else if (!game.getWhiteTurn() && role == ClientGameplayData.Role.WHITE) {
+            return "Error: It is not your turn";}
+        else if (role == ClientGameplayData.Role.OBSERVER) {
+            return "Error: You can't make moves as an observer";}
         if (params.length < 2 || params[0].length() != 2 || params[1].length() != 2) {
-            return "Error: input move in this format: a3 b4";
-        }
+            return "Error: input move in this format: 'a3 b4'";}
 
         char r0 = params[0].charAt(1);
         char c0 = params[0].charAt(0);
@@ -123,9 +128,7 @@ public class GameplayUI implements ServerMessageHandler {
         try {
             coordinates = cleanCoordinates(r0, c0, r1, c1);
         } catch (Exception e) {
-            return "Error: invalid coordinates entered. See chessboard for possible coordinates";
-        }
-
+            return "Error: invalid coordinates entered. Inputs must be a-h and 1-8";}
 
         var startPosition = new ChessPosition(coordinates.r0(), coordinates.c0());
         var endPosition = new ChessPosition(coordinates.r1(), coordinates.c1());
@@ -146,12 +149,19 @@ public class GameplayUI implements ServerMessageHandler {
             try {
                 piece = cleanPieceInput(letter);
             } catch (Exception e) {
-                return "Error: bad piece type";
-            }
-        }
+                return "Error: bad piece type";}}
 
         var move = new ChessMove(new ChessPosition(r0, c0), new ChessPosition(r1, c1), piece);
-    }
+
+        try {
+            game.makeMove(move);
+        } catch (Exception e) {
+            return "Error: not a legal move";}
+
+        var data = new ClientGameplayData(username, role, gameID);
+        ws.makeMove(data, move);
+        return "";}
+
     // WebsocketFacade
     public String resign() {
 
@@ -183,10 +193,6 @@ public class GameplayUI implements ServerMessageHandler {
                 - moves (highlight legal moves)
                 - help
                 """;
-    }
-
-    public void setGame(ChessGame game) {
-        this.game = game;
     }
 
     private void prompt() {
