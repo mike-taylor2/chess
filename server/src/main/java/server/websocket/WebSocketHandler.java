@@ -69,25 +69,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var game = gameService.makeMove(command.getGameID(), command.getMove());
             var loadGameMessage = new LoadGameMessage(game);
             var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s", username, "a3", "a4"));
-
+            // Check for Check, CheckMate, StaleMate
+            connections.broadcastEveryone(command.getGameID(), session, loadGameMessage);
+            connections.broadcast(command.getGameID(), session, notificationMessage);
         } catch (Exception e) {
             var errorMessage = new ErrorMessage("Error: Invalid move");
-            connections.directedMessage(session, errorMessage);
+            connections.directedMessage(command.getGameID(), session, errorMessage);
         }
 
     }
 
-    private void verifyInputData(Session session, String authToken, Integer gameID) throws IOException {
+    private void verifyInputData(Session session, String authToken, Integer gameID) {
         try {
             userService.verifyAuthData(authToken);
         }catch (Exception e) {
             var errorMessage = new ErrorMessage("Error: not authorized");
-            connections.directedMessage(session, errorMessage);
+            connections.directedMessage(gameID, session, errorMessage);
             return;
         }
         if (!gameService.verifyGameID(gameID)) {
             var errorMessage = new ErrorMessage("Error: gameID does not exist");
-            connections.directedMessage(session, errorMessage);
+            connections.directedMessage(gameID, session, errorMessage);
         }
     }
 

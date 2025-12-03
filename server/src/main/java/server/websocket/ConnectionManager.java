@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
@@ -14,8 +15,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
 
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Set<Session>> connections = new ConcurrentHashMap<>();
@@ -37,34 +36,63 @@ public class ConnectionManager {
                     connections.get(i).add(session);
                     var loadGameMessage = new LoadGameMessage(game);
                     var notificationMessage = new NotificationMessage(String.format("Update: %s joined the game as %s", username, command.getRole()));
-                    directedMessage(session, loadGameMessage);
-                    broadcast(session, notificationMessage);
+                    directedMessage(i, session, loadGameMessage);
+                    broadcast(i, session, notificationMessage);
                     return;
                 }
             }
         }
         catch (Exception e) {
             var errorMessage = new ErrorMessage("Error: gameID does not exist");
-            directedMessage(session, errorMessage);
+            directedMessage(command.getGameID(), session, errorMessage);
         }
     }
 
-    public void leave(int GameID, Session session) throws IOException {
+    public void leave(int gameID, Session session) throws IOException {
         for (Integer i : connections.keySet()) {
-            if (i.equals(GameID)) {
+            if (i.equals(gameID)) {
                 connections.get(i).remove(session);
                 return;
             }
         }
         var errorMessage = new ErrorMessage("Error: gameID does not exist");
-        directedMessage(session, errorMessage);
+        directedMessage(gameID, session, errorMessage);
     }
 
-    public void broadcast(Session excludeSession, ServerMessage message) throws IOException {
-
+    public void broadcast(int gameID, Session excludeSession, ServerMessage message) {
+        Set<Session> sessions = connections.get(gameID);
+        String json = new Gson().toJson(message);
+        try{
+            for (Session s : sessions) {
+                if (s.isOpen()) {
+                    if (!s.equals(excludeSession)){
+                        s.getRemote().sendString(json);
+                    }
+                }
+            }
+        } catch (Exception e){
+            System.out.print("Error: broadcast failed");
+        }
     }
 
-    public void directedMessage(Session session, ServerMessage message) throws IOException {
+    public void directedMessage(int gameID, Session session, ServerMessage message) {
+        Set<Session> sessions = connections.get(gameID);
+        String json = new Gson().toJson(message);
+        try{
+            for (Session s : sessions) {
+                if (s.isOpen()) {
+                    if (s.equals(session)){
+                        s.getRemote().sendString(json);
+                    }
+                }
+            }
+        } catch (Exception e){
+            System.out.print("Error: directed message failed");
+        }
+    }
 
+    public void broadcastEveryone(int gameID, Session session, ServerMessage message) {
+        broadcast(gameID, session, message);
+        directedMessage(gameID, session, message);
     }
 }
