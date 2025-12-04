@@ -120,13 +120,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ChessGame.TeamColor color;
         NotificationMessage message = null;
         if (whiteTurn){
-            color = ChessGame.TeamColor.BLACK;
+            color = ChessGame.TeamColor.WHITE;
         }
         else {
-            color = ChessGame.TeamColor.WHITE;
+            color = ChessGame.TeamColor.BLACK;
         }
         if (game.isInCheckmate(color)){
             message = new NotificationMessage("CHECKMATE!");
+            // Create a finishGame method that goes to DAO and marks a game as finished
         }
         else if (game.isInCheck(color)){
             message = new NotificationMessage("CHECK!");

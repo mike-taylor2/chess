@@ -23,4 +23,8 @@ public interface GameDataAccess {
     boolean verifyGameID(int gameID);
 
     ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException;
+
+    void finishGame(int gameID);
+
+    boolean checkFinishedGame(int gameID);
 }

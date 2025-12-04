@@ -151,7 +151,7 @@ public class GameplayUI implements ServerMessageHandler {
             } catch (Exception e) {
                 return "Error: bad piece type";}}
 
-        var move = new ChessMove(new ChessPosition(r0, c0), new ChessPosition(r1, c1), piece);
+        var move = new ChessMove(startPosition, endPosition, piece);
 
         try {
             game.makeMove(move);

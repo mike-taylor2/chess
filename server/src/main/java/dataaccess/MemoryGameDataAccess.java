@@ -72,4 +72,12 @@ public class MemoryGameDataAccess implements GameDataAccess{
     public ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException {
         return new ChessGame();
     }
+
+    public void finishGame(int gameID){
+        return;
+    }
+
+    public boolean checkFinishedGame(int gameID) {
+        return true;
+    }
 }

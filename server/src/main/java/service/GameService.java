@@ -42,4 +42,12 @@ public class GameService {
     public ChessGame makeMove(int gameID, ChessMove move) throws InvalidMoveException {
         return gameData.makeMove(gameID, move);
     }
+
+    public void finishGame(int gameID) {
+        return gameData.finishGame(gameID);
+    }
+
+    public boolean checkFinishedGame(int gameID) {
+        return gameData.checkFinishedGame(gameID);
+    }
 }

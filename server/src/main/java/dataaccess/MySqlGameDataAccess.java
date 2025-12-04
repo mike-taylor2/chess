@@ -9,7 +9,6 @@ import model.GameData;
 import model.JoinGameRequest;
 import service.AlreadyTakenException;
 import service.EmptyFieldException;
-import service.ResponseException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -184,5 +183,17 @@ public class MySqlGameDataAccess implements GameDataAccess{
         GameData newGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), oldGame.blackUsername(), oldGame.gameName(), game);
         editGame(oldGame, newGame);
         return findGame(gameID).game();
+    }
+
+    public void finishGame(int gameID) {
+        var oldGame = findGame(gameID);
+        var finishMarker = oldGame.gameName() + " (FINISHED)";
+        var newGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), oldGame.blackUsername(), finishMarker, oldGame.game());
+        editGame(oldGame, newGame);
+    }
+
+    public boolean checkFinishedGame(int gameID) {
+        var game = findGame(gameID);
+        return game.gameName().contains("(FINISHED)");
     }
 }
