@@ -2,7 +2,6 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
-import chess.ChessPiece;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -14,7 +13,6 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +54,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void joinGame(ConnectUserGameCommand command, Session session) {
         String username;
-        verifyInputData(session, command.getAuthToken(), command.getGameID());
+        if (!goodAuthData(session, command.getAuthToken(), command.getGameID())){
+            return;}
         try {
             username = userService.getUsername(command.getAuthToken());
             connections.join(session, game, command, username);
@@ -67,7 +66,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(MakeMoveUserGameCommand command, Session session) {
-        verifyInputData(session, command.getAuthToken(), command.getGameID());
+        if (!goodAuthData(session, command.getAuthToken(), command.getGameID())){
+            return;
+        }
         var username = userService.getUsername(command.getAuthToken());
         try {
             // Check for Finished
@@ -87,18 +88,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void verifyInputData(Session session, String authToken, Integer gameID) {
+    private boolean goodAuthData(Session session, String authToken, Integer gameID) {
         try {
             userService.verifyAuthData(authToken);
         }catch (Exception e) {
             var errorMessage = new ErrorMessage("Error: not authorized");
             connections.directedMessage(gameID, session, errorMessage);
-            return;
+            return false;
         }
         if (!gameService.verifyGameID(gameID)) {
             var errorMessage = new ErrorMessage("Error: gameID does not exist");
             connections.directedMessage(gameID, session, errorMessage);
+            return false;
         }
+        return true;
     }
 
     @Override

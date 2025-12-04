@@ -74,6 +74,7 @@ public class ConnectionManager {
     }
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage message) {
+
         Set<Session> sessions = connections.get(gameID);
         String json = new Gson().toJson(message);
         try{
@@ -90,16 +91,9 @@ public class ConnectionManager {
     }
 
     public void directedMessage(int gameID, Session session, ServerMessage message) {
-        Set<Session> sessions = connections.get(gameID);
         String json = new Gson().toJson(message);
         try{
-            for (Session s : sessions) {
-                if (s.isOpen()) {
-                    if (s.equals(session)){
-                        s.getRemote().sendString(json);
-                    }
-                }
-            }
+            session.getRemote().sendString(json);
         } catch (Exception e){
             System.out.print("Error: directed message failed");
         }

@@ -32,7 +32,7 @@ public class UserService {
         return userData.deleteAuthToken(req.authToken());
     }
 
-    public void verifyAuthData(String authToken) throws UnauthorizedException{
+    public void verifyAuthData(String authToken){
         if (!userData.verifyAuthData(authToken)){
             throw new UnauthorizedException("Error: Unauthorized");
         }

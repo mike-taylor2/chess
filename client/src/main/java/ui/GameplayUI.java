@@ -182,11 +182,11 @@ public class GameplayUI implements ServerMessageHandler {
         }
         else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             var notification = (NotificationMessage) serverMessage;
-            System.out.println(SET_TEXT_COLOR_RED + notification.getMessage());
+            System.out.println(SET_TEXT_COLOR_GREEN + notification.getMessage() + RESET_TEXT_COLOR);
         }
         else {
             var error = (ErrorMessage) serverMessage;
-            System.out.println(SET_TEXT_COLOR_RED + error.getMessage());
+            System.out.println(SET_TEXT_COLOR_RED + error.getMessage() + RESET_TEXT_COLOR);
         }
         prompt();
     }
