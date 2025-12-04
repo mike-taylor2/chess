@@ -44,7 +44,7 @@ public class GameService {
     }
 
     public void finishGame(int gameID) {
-        return gameData.finishGame(gameID);
+        gameData.finishGame(gameID);
     }
 
     public boolean checkFinishedGame(int gameID) {

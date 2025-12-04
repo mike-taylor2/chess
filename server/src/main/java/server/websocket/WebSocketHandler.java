@@ -75,15 +75,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (!correctRole(command.getAuthToken(), command.getGameID(), command.getMove(), session)){
             return;
         }
+        if (checkFinishedGame(command.getGameID())) {
+            var errorMessage = new ErrorMessage("Error: Game is finished");
+            connections.directedMessage(command.getGameID(), session, errorMessage);
+            return;
+        }
         var username = userService.getUsername(command.getAuthToken());
         try {
-            // Check for Finished
             game = gameService.makeMove(command.getGameID(), command.getMove());
             var loadGameMessage = new LoadGameMessage(game);
             var formattedMove = formatMove(command.getMove());
             var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s",
                     username, formattedMove.getFirst(), formattedMove.getLast()));
-            // Check for Check, CheckMate, StaleMate
             checkForCheck(command.getGameID(), session);
             connections.broadcastEveryone(command.getGameID(), session, loadGameMessage);
             connections.broadcast(command.getGameID(), session, notificationMessage);
@@ -126,14 +129,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             color = ChessGame.TeamColor.BLACK;
         }
         if (game.isInCheckmate(color)){
-            message = new NotificationMessage("CHECKMATE!");
-            // Create a finishGame method that goes to DAO and marks a game as finished
+            message = new NotificationMessage("CHECKMATE! Game is finished");
+            finishGame(gameID);
         }
         else if (game.isInCheck(color)){
             message = new NotificationMessage("CHECK!");
         }
         else if (game.isInStalemate(color)){
-            message = new NotificationMessage("STALEMATE!");
+            message = new NotificationMessage("STALEMATE! Game is finished");
+            finishGame(gameID);
         }
         if (message != null){
             connections.broadcastEveryone(gameID, session, message);
@@ -206,5 +210,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         }
         return null;
+    }
+
+    private void finishGame(int gameID) {
+        gameService.finishGame(gameID);
+    }
+
+    private boolean checkFinishedGame(int gameID) {
+        return gameService.checkFinishedGame(gameID);
     }
 }
