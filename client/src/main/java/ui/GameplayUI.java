@@ -232,16 +232,16 @@ public class GameplayUI implements ServerMessageHandler {
         );
         int r0_, c0_, r1_, c1_;
 
-        String _r0 = String.valueOf(r0).toLowerCase();
-        String _c0 = String.valueOf(c0);
-        String _r1 = String.valueOf(r1).toLowerCase();
-        String _c1 = String.valueOf(c1);
+        String _r0 = String.valueOf(r0);
+        String _c0 = String.valueOf(c0).toLowerCase();
+        String _r1 = String.valueOf(r1);
+        String _c1 = String.valueOf(c1).toLowerCase();
 
         try {
-            r0_ = map0.get(_r0);
-            c0_ = Integer.parseInt(_c0);
-            r1_ = map0.get(_r1);
-            c1_ = Integer.parseInt(_c1);
+            r0_ = Integer.parseInt(_r0);
+            c0_ = map0.get(_c0);
+            r1_ = Integer.parseInt(_r1);
+            c1_ = map0.get(_c1);
 
             if (c0_ < 1 || c0_ > 8 || c1_ < 1 || c1_ > 8) {
                 throw new ResponseException(ResponseException.Code.ServerError, "Bad input");

@@ -2,8 +2,11 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
@@ -67,6 +70,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(MakeMoveUserGameCommand command, Session session) {
         if (!goodAuthData(session, command.getAuthToken(), command.getGameID())){
+            return;
+        }
+        if (!correctRole(command.getAuthToken(), command.getGameID(), command.getMove(), session)){
             return;
         }
         var username = userService.getUsername(command.getAuthToken());
@@ -155,5 +161,49 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String firstCoordinate = map.get(sCol) + sRow;
         String secondCoordinate = map.get(eCol) + eRow;
         return List.of(firstCoordinate, secondCoordinate);
+    }
+
+    private boolean correctRole(String authToken, int gameID, ChessMove chessMove, Session session) {
+        String username = userService.getUsername(authToken);
+        ChessPosition start = chessMove.getStartPosition();
+        GameData gameData = getGame(gameID);
+        ChessGame game = gameData.game();
+        var color = game.getPiece(start).getTeamColor();
+        ChessGame.TeamColor userColor = getUserColor(gameData, username);
+        if (userColor == null) {
+            var errorMessage = new ErrorMessage("Error: Observers can't make moves");
+            connections.directedMessage(gameID, session, errorMessage);
+            return false;
+        }
+        else if (!userColor.equals(color)){
+            var errorMessage = new ErrorMessage("Error: Can't make moves for the opposite team");
+            connections.directedMessage(gameID, session, errorMessage);
+            return false;
+        }
+        return true;
+    }
+
+    private GameData getGame(int gameID) {
+        var gameList = gameService.listGames().games();
+        for (GameData game : gameList) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
+        }
+        return null;
+    }
+
+    private ChessGame.TeamColor getUserColor (GameData gameData, String username) {
+        if (gameData.blackUsername() != null){
+            if (gameData.blackUsername().equals(username)){
+                return ChessGame.TeamColor.BLACK;
+            }
+        }
+        if (gameData.whiteUsername() != null) {
+            if (gameData.whiteUsername().equals(username)){
+                return ChessGame.TeamColor.WHITE;
+            }
+        }
+        return null;
     }
 }

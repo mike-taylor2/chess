@@ -71,7 +71,6 @@ public class WebSocketFacade extends Endpoint {
         catch (Exception e) {
             System.out.print("Error: unable to send");
         }
-        
     }
 
     private ConnectUserGameCommand getConnectUserGameCommand(ClientGameplayData data) {
