@@ -3,7 +3,6 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
-import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
 import model.GameData;
@@ -45,9 +44,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 //                case LEAVE -> {
 //                    LeaveUserGameCommand leaveCommand = new Gson().fromJson(ctx.message(), LeaveUserGameCommand.class);
 //                    leave(leaveCommand, ctx.session);}
-//                case RESIGN -> {
-//                    ResignUserGameCommand resignCommand = new Gson().fromJson(ctx.message(), ResignUserGameCommand.class);
-//                    resign(resignCommand, ctx.session);}
+                case RESIGN -> {
+                    ResignUserGameCommand resignCommand = new Gson().fromJson(ctx.message(), ResignUserGameCommand.class);
+                    resign(resignCommand, ctx.session);}
             }
         }
         catch (Exception ex) {
@@ -94,7 +93,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var errorMessage = new ErrorMessage("Error: Invalid move");
             connections.directedMessage(command.getGameID(), session, errorMessage);
         }
+    }
 
+    private void resign(ResignUserGameCommand command, Session session) {
+        if (!goodAuthData(session, command.getAuthToken(), command.getGameID())){
+            return;
+        }
+        var game = getGame(command.getGameID());
+        var username = userService.getUsername(command.getAuthToken());
+        if (getUserColor(game, username) == null) {
+            var errorMessage = new ErrorMessage("Error: Observers can't resign");
+            connections.directedMessage(command.getGameID(), session, errorMessage);
+            return;
+        }
+        if (checkFinishedGame(command.getGameID())) {
+            var errorMessage = new ErrorMessage("Error: Game is finished");
+            connections.directedMessage(command.getGameID(), session, errorMessage);
+            return;
+        }
+        finishGame(game.gameID());
+        var notification = new NotificationMessage(String.format("%s has resigned", username));
+        connections.broadcastEveryone(game.gameID(), session, notification);
     }
 
     private boolean goodAuthData(Session session, String authToken, Integer gameID) {
@@ -122,21 +141,28 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var whiteTurn = game.getWhiteTurn();
         ChessGame.TeamColor color;
         NotificationMessage message = null;
+        GameData gameData = getGame(gameID);
+        String username;
+        if (gameData == null) {
+            return;
+        }
         if (whiteTurn){
             color = ChessGame.TeamColor.WHITE;
+            username = gameData.whiteUsername();
         }
         else {
             color = ChessGame.TeamColor.BLACK;
+            username = gameData.blackUsername();
         }
         if (game.isInCheckmate(color)){
-            message = new NotificationMessage("CHECKMATE! Game is finished");
+            message = new NotificationMessage(String.format("%s is in CHECKMATE! Game is finished", username));
             finishGame(gameID);
         }
         else if (game.isInCheck(color)){
-            message = new NotificationMessage("CHECK!");
+            message = new NotificationMessage(String.format("%s is in CHECK!", username));
         }
         else if (game.isInStalemate(color)){
-            message = new NotificationMessage("STALEMATE! Game is finished");
+            message = new NotificationMessage(String.format("%s is in STALEMATE! Game is finished", username));
             finishGame(gameID);
         }
         if (message != null){

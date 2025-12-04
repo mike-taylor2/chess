@@ -84,7 +84,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "redraw" -> redraw();
 //                case "leave" -> leave();
                 case "move" -> makeMove(params);
-//                case "resign" -> resign();
+                case "resign" -> resign();
 //                case "moves" -> legalMoves();
                 default -> help();
             };
@@ -162,11 +162,29 @@ public class GameplayUI implements ServerMessageHandler {
         ws.makeMove(data, move);
         return "";}
 
-//    // WebsocketFacade
-//    public String resign() {
-//
-//    }
-//    // Local
+    // WebsocketFacade
+    public String resign() {
+        if (game.getWhiteTurn() && role == ClientGameplayData.Role.BLACK) {
+            return "Error: It is not your turn";}
+        else if (!game.getWhiteTurn() && role == ClientGameplayData.Role.WHITE) {
+            return "Error: It is not your turn";}
+        else if (role == ClientGameplayData.Role.OBSERVER) {
+            return "Error: You can't resign as an observer";}
+
+        System.out.print(
+                """
+                Once you resign, the game is over. Are you sure you want to resign? y/n""");
+        prompt();
+        String letter = scanner.nextLine().toLowerCase();
+        var data = new ClientGameplayData(username, role, gameID);
+        if (letter.charAt(0) == 'y') {
+            ws.resign(data);
+            return "";
+        } else {
+            return "Not resigning";
+        }
+    }
+    // Local
 //    public String legalMoves() {
 //
 //    }

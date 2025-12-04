@@ -8,6 +8,7 @@ import jakarta.websocket.*;
 import model.ClientGameplayData;
 import websocket.commands.ConnectUserGameCommand;
 import websocket.commands.MakeMoveUserGameCommand;
+import websocket.commands.ResignUserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -96,12 +97,17 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void leave(String username, int gameID) {
+    public void leave(ClientGameplayData data) {
 
     }
 
-    public void resign(String username, int gameID) {
-
+    public void resign(ClientGameplayData data) {
+        var command = new ResignUserGameCommand(authToken, data.gameID());
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) {
+            System.out.print("Error: failed to connect to server");
+        }
     }
 
     public ChessGame getCurrentGame(){
