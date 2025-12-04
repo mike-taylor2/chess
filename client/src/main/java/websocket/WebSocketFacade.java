@@ -8,6 +8,7 @@ import jakarta.websocket.*;
 import model.ClientGameplayData;
 import websocket.commands.ConnectUserGameCommand;
 import websocket.commands.MakeMoveUserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -39,10 +40,18 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
                     if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                        var loadGameMessage = (LoadGameMessage) serverMessage;
+                        var loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                         currentGame = loadGameMessage.getGame();
+                        serverMessageHandler.notify(loadGameMessage);
                     }
-                    serverMessageHandler.notify(serverMessage);
+                    else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+                        var notification = new Gson().fromJson(message, NotificationMessage.class);
+                        serverMessageHandler.notify(notification);
+                    }
+                    else {
+                        var error = new Gson().fromJson(message, ErrorMessage.class);
+                        serverMessageHandler.notify(error);
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -60,7 +69,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(command));   
         }
         catch (Exception e) {
-            throw new ResponseException(ResponseException.Code.ServerError, e.getMessage());
+            System.out.print("Error: unable to send");
         }
         
     }

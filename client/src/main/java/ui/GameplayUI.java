@@ -11,6 +11,8 @@ import model.DataCoordinates;
 import model.JoinGameRequest;
 import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -42,14 +44,12 @@ public class GameplayUI implements ServerMessageHandler {
         this.ws = new WebSocketFacade(server.getServerUrl(), this, authToken);
         this.scanner = new Scanner(System.in);
 
-        redraw();
-
         var clientData = new ClientGameplayData(username, role, gameID);
         try {
             ws.joinGame(clientData);
         }
         catch (Exception e) {
-            throw new ResponseException(ResponseException.Code.ServerError, "Error: Failed to connect");
+            System.out.print("Error: unable to Connect");
         }
     }
 
@@ -82,13 +82,13 @@ public class GameplayUI implements ServerMessageHandler {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> redraw();
-                case "leave" -> leave();
+//                case "leave" -> leave();
                 case "move" -> makeMove(params);
-                case "resign" -> resign();
-                case "moves" -> legalMoves();
+//                case "resign" -> resign();
+//                case "moves" -> legalMoves();
                 default -> help();
             };
-        } catch (ResponseException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
@@ -105,9 +105,9 @@ public class GameplayUI implements ServerMessageHandler {
         return "";
     }
     // WebsocketFacade
-    public String leave() {
+//    public String leave() {
+//    }
 
-    }
     // WebsocketFacade
     public String makeMove(String ... params) {
         if (game.getWhiteTurn() && role == ClientGameplayData.Role.BLACK) {
@@ -162,24 +162,31 @@ public class GameplayUI implements ServerMessageHandler {
         ws.makeMove(data, move);
         return "";}
 
-    // WebsocketFacade
-    public String resign() {
-
-    }
-    // Local
-    public String legalMoves() {
-
-    }
+//    // WebsocketFacade
+//    public String resign() {
+//
+//    }
+//    // Local
+//    public String legalMoves() {
+//
+//    }
 
     public void notify(ServerMessage serverMessage) {
         // This is where the LOAD_GAME server message is received and client redraws board
         if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            game = ws.getCurrentGame();
+            var loadGame = (LoadGameMessage) serverMessage;
+            game = loadGame.getGame();
+            System.out.print("\n\n");
             redraw();
+            System.out.println(SET_TEXT_COLOR_BLUE + "CONNECTED" + RESET_TEXT_COLOR);
         }
-        else {
+        else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             var notification = (NotificationMessage) serverMessage;
             System.out.println(SET_TEXT_COLOR_RED + notification.getMessage());
+        }
+        else {
+            var error = (ErrorMessage) serverMessage;
+            System.out.println(SET_TEXT_COLOR_RED + error.getMessage());
         }
         prompt();
     }

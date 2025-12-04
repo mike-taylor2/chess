@@ -19,18 +19,32 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Set<Session>> connections = new ConcurrentHashMap<>();
 
-    public ConnectionManager() {
+    private void configure() {
         var gameService = new GameService();
         var games = gameService.listGames().games();
 
+//        for (GameData game : games) {
+//            connections.put(game.gameID(), new HashSet<Session>());
+//            }
         for (GameData game : games) {
-            connections.put(game.gameID(), new HashSet<Session>());
+            int gameID = game.gameID();
+            boolean out = true;
+            for (Integer id : connections.keySet()) {
+                if (id.equals(gameID)) {
+                    out = false;
+                }
+            }
+            if (out) {
+                connections.put(game.gameID(), new HashSet<Session>());
+            }
         }
     }
+
 
     // Update later to create a message with specified role
     public void join(Session session, ChessGame game, ConnectUserGameCommand command, String username) throws IOException {
         try{
+            configure();
             for (Integer i : connections.keySet()) {
                 if (i.equals(command.getGameID())) {
                     connections.get(i).add(session);
