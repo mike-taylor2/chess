@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -13,6 +15,8 @@ import websocket.messages.NotificationMessage;
 
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -66,10 +70,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         verifyInputData(session, command.getAuthToken(), command.getGameID());
         var username = userService.getUsername(command.getAuthToken());
         try {
-            var game = gameService.makeMove(command.getGameID(), command.getMove());
+            // Check for Finished
+            game = gameService.makeMove(command.getGameID(), command.getMove());
             var loadGameMessage = new LoadGameMessage(game);
-            var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s", username, "a3", "a4"));
+            var formattedMove = formatMove(command.getMove());
+            var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s",
+                    username, formattedMove.getFirst(), formattedMove.getLast()));
             // Check for Check, CheckMate, StaleMate
+            checkForCheck(command.getGameID(), session);
             connections.broadcastEveryone(command.getGameID(), session, loadGameMessage);
             connections.broadcast(command.getGameID(), session, notificationMessage);
         } catch (Exception e) {
@@ -96,5 +104,53 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(WsCloseContext ctx) {
         System.out.println("Websocket closed");
+    }
+
+    private void checkForCheck(int gameID, Session session) {
+        var whiteTurn = game.getWhiteTurn();
+        ChessGame.TeamColor color;
+        NotificationMessage message = null;
+        if (whiteTurn){
+            color = ChessGame.TeamColor.BLACK;
+        }
+        else {
+            color = ChessGame.TeamColor.WHITE;
+        }
+        if (game.isInCheckmate(color)){
+            message = new NotificationMessage("CHECKMATE!");
+        }
+        else if (game.isInCheck(color)){
+            message = new NotificationMessage("CHECK!");
+        }
+        else if (game.isInStalemate(color)){
+            message = new NotificationMessage("STALEMATE!");
+        }
+        if (message != null){
+            connections.broadcastEveryone(gameID, session, message);
+        }
+    }
+
+    private List<String> formatMove(ChessMove move) {
+        Map<Integer, String> map = Map.of(
+                1, "a",
+                2, "b",
+                3, "c",
+                4, "d",
+                5, "e",
+                6, "f",
+                7, "g",
+                8, "h"
+        );
+
+        var start = move.getStartPosition();
+        var sRow = start.getRow();
+        var sCol = start.getColumn();
+        var end = move.getEndPosition();
+        var eRow = end.getRow();
+        var eCol = end.getColumn();
+
+        String firstCoordinate = map.get(sCol) + sRow;
+        String secondCoordinate = map.get(eCol) + eRow;
+        return List.of(firstCoordinate, secondCoordinate);
     }
 }

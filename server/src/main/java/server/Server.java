@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 
 import java.util.Map;
@@ -15,11 +16,13 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final ClearService clearService;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         userService = new UserService();
         gameService = new GameService();
         clearService = new ClearService(userService, gameService);
+        webSocketHandler = new WebSocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -30,7 +33,7 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
-        .ws("/ws", ws -> {
+        javalin.ws("/ws", ws -> {
             ws.onConnect(webSocketHandler);
             ws.onMessage(webSocketHandler);
             ws.onClose(webSocketHandler);
