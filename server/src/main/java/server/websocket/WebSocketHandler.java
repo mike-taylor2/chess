@@ -41,9 +41,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case MAKE_MOVE -> {
                     MakeMoveUserGameCommand makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveUserGameCommand.class);
                     makeMove(makeMoveCommand, ctx.session);}
-//                case LEAVE -> {
-//                    LeaveUserGameCommand leaveCommand = new Gson().fromJson(ctx.message(), LeaveUserGameCommand.class);
-//                    leave(leaveCommand, ctx.session);}
+                case LEAVE -> {
+                    LeaveUserGameCommand leaveCommand = new Gson().fromJson(ctx.message(), LeaveUserGameCommand.class);
+                    leave(leaveCommand, ctx.session);}
                 case RESIGN -> {
                     ResignUserGameCommand resignCommand = new Gson().fromJson(ctx.message(), ResignUserGameCommand.class);
                     resign(resignCommand, ctx.session);}
@@ -113,7 +113,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         finishGame(game.gameID());
         var notification = new NotificationMessage(String.format("%s has resigned", username));
-        connections.broadcastEveryone(game.gameID(), session, notification);
+        connections.broadcastEveryone(command.getGameID(), session, notification);
+    }
+
+    private void leave(LeaveUserGameCommand command, Session session) {
+        if (!goodAuthData(session, command.getAuthToken(), command.getGameID())){
+            return;
+        }
+        var game = getGame(command.getGameID());
+        var username = userService.getUsername(command.getAuthToken());
+        var color = getUserColor(game, username);
+        if (color != null) {
+            gameService.leaveGame(command.getGameID(), username);
+        }
+        var notification = new NotificationMessage(String.format("%s has left the game", username));
+        connections.leave(command.getGameID(), session);
+        connections.broadcast(command.getGameID(), session, notification);
     }
 
     private boolean goodAuthData(Session session, String authToken, Integer gameID) {

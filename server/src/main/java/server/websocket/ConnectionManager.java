@@ -62,7 +62,7 @@ public class ConnectionManager {
         }
     }
 
-    public void leave(int gameID, Session session) throws IOException {
+    public void leave(int gameID, Session session) {
         for (Integer i : connections.keySet()) {
             if (i.equals(gameID)) {
                 connections.get(i).remove(session);

@@ -4,7 +4,6 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import dataaccess.GameDataAccess;
-import dataaccess.MemoryGameDataAccess;
 import dataaccess.MySqlGameDataAccess;
 import model.*;
 
@@ -49,5 +48,9 @@ public class GameService {
 
     public boolean checkFinishedGame(int gameID) {
         return gameData.checkFinishedGame(gameID);
+    }
+
+    public void leaveGame(int gameID, String username) {
+        gameData.leaveGame(gameID, username);
     }
 }

@@ -80,4 +80,8 @@ public class MemoryGameDataAccess implements GameDataAccess{
     public boolean checkFinishedGame(int gameID) {
         return true;
     }
+
+    public void leaveGame(int gameID, String username) {
+        return;
+    }
 }

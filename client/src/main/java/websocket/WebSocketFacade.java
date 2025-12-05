@@ -7,6 +7,7 @@ import exception.ResponseException;
 import jakarta.websocket.*;
 import model.ClientGameplayData;
 import websocket.commands.ConnectUserGameCommand;
+import websocket.commands.LeaveUserGameCommand;
 import websocket.commands.MakeMoveUserGameCommand;
 import websocket.commands.ResignUserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -98,7 +99,12 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void leave(ClientGameplayData data) {
-
+        var command = new LeaveUserGameCommand(authToken, data.gameID());
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (Exception e) {
+            System.out.print("Error: failed to connect to server");
+        }
     }
 
     public void resign(ClientGameplayData data) {

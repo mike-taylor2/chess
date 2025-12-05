@@ -196,4 +196,20 @@ public class MySqlGameDataAccess implements GameDataAccess{
         var game = findGame(gameID);
         return game.gameName().contains("(FINISHED)");
     }
+
+    public void leaveGame(int gameID, String username) {
+        var oldGame = findGame(gameID);
+        GameData newGame;
+        if (oldGame.whiteUsername() != null) {
+            if (oldGame.whiteUsername().equals(username)) {
+                newGame = new GameData(oldGame.gameID(), null, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+            }
+            else {
+                newGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), null, oldGame.gameName(), oldGame.game());
+            }
+        } else {
+            newGame = new GameData(oldGame.gameID(), oldGame.whiteUsername(), null, oldGame.gameName(), oldGame.game());
+        }
+        editGame(oldGame, newGame);
+    }
 }

@@ -47,6 +47,7 @@ public class GameplayUI implements ServerMessageHandler {
         var clientData = new ClientGameplayData(username, role, gameID);
         try {
             ws.joinGame(clientData);
+            System.out.println(SET_TEXT_COLOR_BLUE + "CONNECTED" + RESET_TEXT_COLOR);
         }
         catch (Exception e) {
             System.out.print("Error: unable to Connect");
@@ -82,7 +83,7 @@ public class GameplayUI implements ServerMessageHandler {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> redraw();
-//                case "leave" -> leave();
+                case "leave" -> leave();
                 case "move" -> makeMove(params);
                 case "resign" -> resign();
 //                case "moves" -> legalMoves();
@@ -105,8 +106,11 @@ public class GameplayUI implements ServerMessageHandler {
         return "";
     }
     // WebsocketFacade
-//    public String leave() {
-//    }
+    public String leave() {
+        var data = new ClientGameplayData(username, role, gameID);
+        ws.leave(data);
+        return "Leaving game";
+    }
 
     // WebsocketFacade
     public String makeMove(String ... params) {
@@ -196,7 +200,6 @@ public class GameplayUI implements ServerMessageHandler {
             game = loadGame.getGame();
             System.out.print("\n\n");
             redraw();
-            System.out.println(SET_TEXT_COLOR_BLUE + "CONNECTED" + RESET_TEXT_COLOR);
         }
         else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             var notification = (NotificationMessage) serverMessage;
