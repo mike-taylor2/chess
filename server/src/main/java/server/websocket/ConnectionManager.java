@@ -23,9 +23,6 @@ public class ConnectionManager {
         var gameService = new GameService();
         var games = gameService.listGames().games();
 
-//        for (GameData game : games) {
-//            connections.put(game.gameID(), new HashSet<Session>());
-//            }
         for (GameData game : games) {
             int gameID = game.gameID();
             boolean out = true;

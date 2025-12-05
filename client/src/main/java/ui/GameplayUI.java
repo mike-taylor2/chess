@@ -199,10 +199,10 @@ public class GameplayUI implements ServerMessageHandler {
         } catch (Exception e) {
             return "Error: not a valid position";
         }
-        int _r0 = coordinates.r0();
-        int _c0 = coordinates.c0();
+        int nr0 = coordinates.r0();
+        int nc0 = coordinates.c0();
         try {
-            drawLegalMoves(new ChessPosition(_r0, _c0));
+            drawLegalMoves(new ChessPosition(nr0, nc0));
         } catch (Exception e) {
             System.out.print(RESET_BG_COLOR);
             System.out.print(RESET_TEXT_COLOR);
@@ -270,26 +270,26 @@ public class GameplayUI implements ServerMessageHandler {
                 "g", 7,
                 "h", 8
         );
-        int r0_, c0_, r1_, c1_;
+        int or0, oc0, or1, oc1;
 
-        String _r0 = String.valueOf(r0);
-        String _c0 = String.valueOf(c0).toLowerCase();
-        String _r1 = String.valueOf(r1);
-        String _c1 = String.valueOf(c1).toLowerCase();
+        String nr0 = String.valueOf(r0);
+        String nc0 = String.valueOf(c0).toLowerCase();
+        String nr1 = String.valueOf(r1);
+        String nc1 = String.valueOf(c1).toLowerCase();
 
         try {
-            r0_ = Integer.parseInt(_r0);
-            c0_ = map0.get(_c0);
-            r1_ = Integer.parseInt(_r1);
-            c1_ = map0.get(_c1);
+            or0 = Integer.parseInt(nr0);
+            oc0 = map0.get(nc0);
+            or1 = Integer.parseInt(nr1);
+            oc1 = map0.get(nc1);
 
-            if (c0_ < 1 || c0_ > 8 || c1_ < 1 || c1_ > 8) {
+            if (oc0 < 1 || oc0 > 8 || oc1 < 1 || oc1 > 8) {
                 throw new ResponseException(ResponseException.Code.ServerError, "Bad input");
             }
         } catch (Exception e) {
             throw new ResponseException(ResponseException.Code.ServerError, "Bad input");
         }
-        return new DataCoordinates(r0_, c0_, r1_, c1_);
+        return new DataCoordinates(or0, oc0, or1, oc1);
     }
 
     private ChessPiece.PieceType cleanPieceInput(String letter) {
