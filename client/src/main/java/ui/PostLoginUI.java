@@ -40,31 +40,26 @@ public class PostLoginUI {
                 System.out.print(e.toString());
             }
         }
-        try {
-            if (result.contains("observer")) {
-                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.OBSERVER, gameID);
+        if (result.contains("observer")) {
+            var clientData = new ClientGameplayData(username, ClientGameplayData.Role.OBSERVER, gameID);
+            var gameplayUI = new GameplayUI(server, clientData);
+            gameplayUI.run();
+        }
+        else if (result.contains("Joined game")) {
+            if (result.contains("black")) {
+                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.BLACK, gameID);
                 var gameplayUI = new GameplayUI(server, clientData);
                 gameplayUI.run();
             }
-            else if (result.contains("Joined game")) {
-                if (result.contains("black")) {
-                    var clientData = new ClientGameplayData(username, ClientGameplayData.Role.BLACK, gameID);
-                    var gameplayUI = new GameplayUI(server, clientData);
-                    gameplayUI.run();
-                }
-                else {
-                    var clientData = new ClientGameplayData(username, ClientGameplayData.Role.WHITE, gameID);
-                    var gameplayUI = new GameplayUI(server, clientData);
-                    gameplayUI.run();
-                }
-            }
             else {
-                PreLoginUI preUI = new PreLoginUI(server);
-                preUI.run();
+                var clientData = new ClientGameplayData(username, ClientGameplayData.Role.WHITE, gameID);
+                var gameplayUI = new GameplayUI(server, clientData);
+                gameplayUI.run();
             }
-        } catch (Exception e) {
-            System.out.print("Error: Failed to connect");
-            this.run();
+        }
+        else {
+            PreLoginUI preUI = new PreLoginUI(server);
+            preUI.run();
         }
     }
 
@@ -109,7 +104,7 @@ public class PostLoginUI {
             var newGame = server.createGame(game);
             gameList.add(new GameData(newGame.gameID(), null, null, params[0], new ChessGame()));
             numberToID.put(gameList.size(), newGame.gameID());
-            return "Success: Created new game " + String.format("(%d)", gameList.size());
+            return "Success: Created new game. Type 'list' to get details";
         }
         catch (Exception e) {
             return e.getMessage();

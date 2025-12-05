@@ -310,5 +310,15 @@ public class ChessGame {
     public boolean getWhiteTurn() {
         return whiteTurn;
     }
+
+
+    public Collection<ChessPosition> getValidEndPositions(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = validMoves(startPosition);
+        Collection<ChessPosition> validEndPositions = new ArrayList<>();
+        for (ChessMove m : validMoves) {
+            validEndPositions.add(m.getEndPosition());
+        }
+        return validEndPositions;
+    }
 }
 

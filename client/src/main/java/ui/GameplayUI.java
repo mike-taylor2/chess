@@ -8,7 +8,6 @@ import exception.ResponseException;
 import facade.ServerFacade;
 import model.ClientGameplayData;
 import model.DataCoordinates;
-import model.JoinGameRequest;
 import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ErrorMessage;
@@ -17,7 +16,6 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -34,7 +32,7 @@ public class GameplayUI implements ServerMessageHandler {
     private final WebSocketFacade ws;
     private final Scanner scanner;
 
-    public GameplayUI(ServerFacade server, ClientGameplayData data) throws ResponseException {
+    public GameplayUI(ServerFacade server, ClientGameplayData data) {
         this.server = server;
         this.username = data.username();
         this.role = data.role();
@@ -56,7 +54,7 @@ public class GameplayUI implements ServerMessageHandler {
 
 
     public void run() {
-        System.out.print(help());
+        System.out.print("Type help to get possible commands\n");
         String result = "";
 
         while (!result.contains("Leaving")) {
@@ -86,7 +84,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "leave" -> leave();
                 case "move" -> makeMove(params);
                 case "resign" -> resign();
-//                case "moves" -> legalMoves();
+                case "moves" -> legalMoves(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -189,9 +187,32 @@ public class GameplayUI implements ServerMessageHandler {
         }
     }
     // Local
-//    public String legalMoves() {
-//
-//    }
+    public String legalMoves(String ... params) {
+        if (params.length < 1 || params[0].length() != 2) {
+            return "Error: input position in this format: 'a4'";
+        }
+        char r0 = params[0].charAt(1);
+        char c0 = params[0].charAt(0);
+
+        DataCoordinates coordinates;
+
+        try {
+            coordinates = cleanCoordinates(r0, c0, '1', 'a');
+        } catch (Exception e) {
+            return "Error: not a valid position";
+        }
+        int _r0 = coordinates.r0();
+        int _c0 = coordinates.c0();
+        try {
+            drawLegalMoves(new ChessPosition(_r0, _c0));
+        } catch (Exception e) {
+            System.out.print(RESET_BG_COLOR);
+            System.out.print(RESET_TEXT_COLOR);
+            return "Error: must choose a space that has a piece";
+        }
+
+        return "";
+    }
 
     public void notify(ServerMessage serverMessage) {
         // This is where the LOAD_GAME server message is received and client redraws board
@@ -281,5 +302,19 @@ public class GameplayUI implements ServerMessageHandler {
                 "k", ChessPiece.PieceType.KNIGHT
         );
         return map.get(letter);
+    }
+
+    private void drawLegalMoves(ChessPosition position) throws ResponseException{
+        DrawBoard board;
+        if (role == ClientGameplayData.Role.BLACK) {
+            board = new DrawBoard(game, "BLACK");
+        }
+        else {
+            board = new DrawBoard(game, "WHITE");
+        }
+        if (game.getBoard().getPiece(position) == null) {
+            throw new ResponseException(ResponseException.Code.ServerError, "Error: no piece found at that location");
+        }
+        board.drawLegalMove(position);
     }
 }

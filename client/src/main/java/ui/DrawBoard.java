@@ -1,12 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.SET_BG_COLOR_BLACK;
@@ -23,10 +21,12 @@ public class DrawBoard {
     private ChessBoard board;
     private String leftMostSquare = "WHITE";
     private String boardColor;
+    private ChessGame game;
 
     public DrawBoard(ChessGame game, String boardColor) {
         this.board = game.getBoard();
         this.boardColor = boardColor;
+        this.game = game;
     }
 
 
@@ -42,6 +42,7 @@ public class DrawBoard {
 
         if (boardColor.equals("WHITE")) { drawWhiteHeader(out);}
         else {drawBlackHeader(out);}
+
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
         out.print('\n');
@@ -58,8 +59,8 @@ public class DrawBoard {
         }
 
         out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(" ");
-
+        out.print("    ");
+        out.print(RESET_BG_COLOR);
         out.println();
     }
 
@@ -74,8 +75,8 @@ public class DrawBoard {
         }
 
         out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(" ");
-
+        out.print("    ");
+        out.print(RESET_BG_COLOR);
         out.println();
     }
 
@@ -105,6 +106,7 @@ public class DrawBoard {
             out.print(" ");
             printColumnNumbers(out, boardRow);
             out.print("  ");
+            out.print(RESET_BG_COLOR);
             out.println();
         }
     }
@@ -178,6 +180,81 @@ public class DrawBoard {
             out.print("B");}
         else {
             out.print("P");}
+    }
+
+    public void drawLegalMove(ChessPosition position) {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
+        out.print(ERASE_SCREEN);
+
+        if (boardColor.equals("WHITE")) { drawWhiteHeader(out);}
+        else {drawBlackHeader(out);}
+
+        drawChessBoardLegalMove(out, position);
+
+        if (boardColor.equals("WHITE")) { drawWhiteHeader(out);}
+        else {drawBlackHeader(out);}
+
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
+        out.print('\n');
+    }
+
+    private void drawChessBoardLegalMove(PrintStream out, ChessPosition position) {
+
+        for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+            out.print(" ");
+            printColumnNumbers(out, boardRow);
+            out.print(" ");
+            drawRowOfSquaresLegalMove(out, 8 - boardRow, position);
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+            out.print(" ");
+            printColumnNumbers(out, boardRow);
+            out.print("  ");
+            out.print(RESET_BG_COLOR);
+            out.println();
+        }
+    }
+
+    private void drawRowOfSquaresLegalMove(PrintStream out, int boardRow, ChessPosition position) {
+        Collection<ChessPosition> validMoves = game.getValidEndPositions(position);
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            ChessPosition p;
+            p = setPosition(boardRow, 1 + boardCol);
+            if (leftMostSquare.equals("WHITE")) {
+                if (validMoves.contains(p)){out.print(SET_BG_COLOR_YELLOW);}
+                else if (p.equals(position)) {out.print(SET_BG_COLOR_GREEN);}
+                else {out.print(SET_BG_COLOR_WHITE);}
+                out.print(" ");
+                // print chess piece?
+                printChessPiece(out, boardRow, 1 + boardCol);
+                out.print(SET_BG_COLOR_WHITE);
+                out.print(" ");
+                leftMostSquare = "BLACK";
+            }
+            else if (leftMostSquare.equals("BLACK")) {
+                if (validMoves.contains(p)){out.print(SET_BG_COLOR_YELLOW);}
+                else if (p.equals(position)) {out.print(SET_BG_COLOR_GREEN);}
+                else {out.print(SET_BG_COLOR_BLACK);}
+                out.print(" ");
+                // print chess piece?
+                printChessPiece(out, boardRow, 1 + boardCol);
+                out.print(SET_BG_COLOR_BLACK);
+                out.print(" ");
+                leftMostSquare = "WHITE";
+            }
+        }
+        if (leftMostSquare.equals("WHITE")) {leftMostSquare = "BLACK";}
+        else {leftMostSquare = "WHITE";}
+    }
+
+    private ChessPosition setPosition(int row, int col) {
+        if (boardColor.equals("BLACK")){
+            return new ChessPosition(Math.abs(9-row), Math.abs(9-col));
+        } else {
+            return new ChessPosition(row, col);
+        }
     }
 
 }

@@ -22,7 +22,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final ConnectionManager connections = new ConnectionManager();
     private final UserService userService = new UserService();
     private final GameService gameService = new GameService();
-    private ChessGame game = new ChessGame();
+    private ChessGame game;
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -60,6 +60,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;}
         try {
             username = userService.getUsername(command.getAuthToken());
+            game = getGame(command.getGameID()).game();
             connections.join(session, game, command, username);
         }
         catch (Exception e) {
