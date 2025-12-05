@@ -45,7 +45,6 @@ public class GameplayUI implements ServerMessageHandler {
         var clientData = new ClientGameplayData(username, role, gameID);
         try {
             ws.joinGame(clientData);
-            System.out.println(SET_TEXT_COLOR_BLUE + "CONNECTED" + RESET_TEXT_COLOR);
         }
         catch (Exception e) {
             System.out.print("Error: unable to Connect");
@@ -136,29 +135,28 @@ public class GameplayUI implements ServerMessageHandler {
         var endPosition = new ChessPosition(coordinates.r1(), coordinates.c1());
         ChessPiece.PieceType piece = null;
         String letter;
+        try {
+            if (possiblePawnPromotion(startPosition, endPosition)) {
+                System.out.print(
+                        """
+                        This move involves pawn promotion. Here are the following options for promotion:
+                        -q (queen)
+                        -r (rook)
+                        -b (bishop)
+                        -k (knight)
+                        """);
+                prompt();
+                letter = scanner.nextLine().toLowerCase();
+                try {
+                    piece = cleanPieceInput(letter);
+                } catch (Exception e) {
+                    return "Error: bad piece type";}}
+        } catch (Exception e) {
+            return "Error: bad coordinates";
+        }
 
-        if (possiblePawnPromotion(startPosition, endPosition)) {
-            System.out.print(
-                    """
-                    This move involves pawn promotion. Here are the following options for promotion:
-                    -q (queen)
-                    -r (rook)
-                    -b (bishop)
-                    -k (knight)
-                    """);
-            prompt();
-            letter = scanner.nextLine().toLowerCase();
-            try {
-                piece = cleanPieceInput(letter);
-            } catch (Exception e) {
-                return "Error: bad piece type";}}
 
         var move = new ChessMove(startPosition, endPosition, piece);
-
-        try {
-            game.makeMove(move);
-        } catch (Exception e) {
-            return "Error: not a legal move";}
 
         var data = new ClientGameplayData(username, role, gameID);
         ws.makeMove(data, move);
@@ -237,7 +235,7 @@ public class GameplayUI implements ServerMessageHandler {
         return """
                 - redraw (board)
                 - leave (leave game)
-                - move <LOWERCASE_LETTER><NUMBER(1-8)><LOWERCASE_LETTER><NUMBER(1-8)>
+                - move <a-h><1-8> <a-h><1-8>
                 - resign
                 - moves (highlight legal moves)
                 - help

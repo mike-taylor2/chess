@@ -76,7 +76,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
         if (checkFinishedGame(command.getGameID())) {
-            var errorMessage = new ErrorMessage("Error: Game is finished");
+            var errorMessage = new ErrorMessage("Error: Game is already finished");
             connections.directedMessage(command.getGameID(), session, errorMessage);
             return;
         }
@@ -87,9 +87,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             var formattedMove = formatMove(command.getMove());
             var notificationMessage = new NotificationMessage(String.format("%s moved from %s to %s",
                     username, formattedMove.getFirst(), formattedMove.getLast()));
-            checkForCheck(command.getGameID(), session);
+            var checkMessage = checkForCheck(command.getGameID(), session);
             connections.broadcastEveryone(command.getGameID(), session, loadGameMessage);
             connections.broadcast(command.getGameID(), session, notificationMessage);
+            if (checkMessage != null) {connections.broadcastEveryone(command.getGameID(), session, checkMessage);}
         } catch (Exception e) {
             var errorMessage = new ErrorMessage("Error: Invalid move");
             connections.directedMessage(command.getGameID(), session, errorMessage);
@@ -108,7 +109,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
         if (checkFinishedGame(command.getGameID())) {
-            var errorMessage = new ErrorMessage("Error: Game is finished");
+            var errorMessage = new ErrorMessage("Error: Game is already over");
             connections.directedMessage(command.getGameID(), session, errorMessage);
             return;
         }
@@ -153,14 +154,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void checkForCheck(int gameID, Session session) {
+    private NotificationMessage checkForCheck(int gameID, Session session) {
         var whiteTurn = game.getWhiteTurn();
         ChessGame.TeamColor color;
         NotificationMessage message = null;
         GameData gameData = getGame(gameID);
         String username;
         if (gameData == null) {
-            return;
+            return message;
         }
         if (whiteTurn){
             color = ChessGame.TeamColor.WHITE;
@@ -181,9 +182,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             message = new NotificationMessage(String.format("%s is in STALEMATE! Game is finished", username));
             finishGame(gameID);
         }
-        if (message != null){
-            connections.broadcastEveryone(gameID, session, message);
-        }
+        return message;
     }
 
     private List<String> formatMove(ChessMove move) {

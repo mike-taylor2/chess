@@ -229,7 +229,6 @@ public class DrawBoard {
                 out.print(" ");
                 // print chess piece?
                 printChessPiece(out, boardRow, 1 + boardCol);
-                out.print(SET_BG_COLOR_WHITE);
                 out.print(" ");
                 leftMostSquare = "BLACK";
             }
@@ -240,7 +239,6 @@ public class DrawBoard {
                 out.print(" ");
                 // print chess piece?
                 printChessPiece(out, boardRow, 1 + boardCol);
-                out.print(SET_BG_COLOR_BLACK);
                 out.print(" ");
                 leftMostSquare = "WHITE";
             }
